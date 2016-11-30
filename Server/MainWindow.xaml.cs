@@ -32,6 +32,8 @@ namespace Server
                 server.IntiServer();
                 clientAccount.fillList();
                 serverStarted.Content = "server sucessfully started";
+
+
                 try
                 {
                     var t1 = new Thread(listenToserver);
@@ -44,12 +46,13 @@ namespace Server
                     displayStatus("connection error");
                 }
 
-
             }
             catch (Exception e)
             {
                 serverStarted.Content = "server failed to start";
             }
+
+
         }
 
         public void displayStatus(string s)
@@ -68,6 +71,19 @@ namespace Server
         {
 
             l.Content += lableContent;
+        }
+
+        private void CreatUserButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var windows = new CreatUserWindows();
+            windows.Activate();
+            windows.InitializeComponent();
+            windows.Show();
+        }
+
+        private void MainWindow_OnClosed(object sender, EventArgs e)
+        {
+            server.tcpListener.Stop();
         }
     }
 

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Cryptocurrency" Class="DataClasses1DataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=hania\sqlexpress;Initial Catalog=Cryptocurrency;Integrated Security=True" SettingsObjectName="Server.Properties.Settings" SettingsPropertyName="CryptocurrencyConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Transactions" Member="Transactions">
+    <Type Name="Transaction">
+      <Column Name="Transaction_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="sender_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="reciver_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Association Name="User_Transaction" Member="User" ThisKey="reciver_Id" OtherKey="Users_Id" Type="User" IsForeignKey="true" />
+      <Association Name="User_Transaction1" Member="User1" ThisKey="sender_Id" OtherKey="Users_Id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="User">
+      <Column Name="Users_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Users_Name" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="User_Password" Type="System.String" DbType="VarChar(250) NOT NULL" CanBeNull="false" />
+      <Column Name="User_balance" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Association Name="User_Transaction" Member="Transactions" ThisKey="Users_Id" OtherKey="reciver_Id" Type="Transaction" />
+      <Association Name="User_Transaction1" Member="Transactions1" ThisKey="Users_Id" OtherKey="sender_Id" Type="Transaction" />
+    </Type>
+  </Table>
+</Database>

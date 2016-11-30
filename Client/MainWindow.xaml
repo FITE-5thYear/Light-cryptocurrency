@@ -4,12 +4,22 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <StackPanel Margin="0,0,352,0" Background="WhiteSmoke">
-            <Label Name="UserNameLabel" Content="User Name"  />
-            <Button Name="ConnectToServerButton" Content="Connect To Server" Click="ConnectToServerButton_OnClick" />
-            <Button Name="RequestAccButton" Content="Request All Account" Visibility="Hidden" Click="RequestAccButton_OnClick"/>
+            <Label Height="40"/>
+            <Label Name="UserNameLabel" Content="User Name" Height="40"  />
+            <Label Height="40" />
+            <Label Name="PasswordLabel" Content="Password" Height="40" />
         </StackPanel>
-        <StackPanel Margin="170,0,0,0" Background="White">
-            <Label Name="ConnectionStatusLabel" Content=""/>
+        <StackPanel Margin="170,0,0,119" Background="White">
+            <Label Height="40" />
+            <TextBox Name="UserNameTextBox" Height="40" />
+            <Label Height="40" />
+            <PasswordBox Name="PasswordBox" Height="40" />
         </StackPanel>
+        <StackPanel Margin="170,205,0,76" Orientation="Horizontal">
+            <Button Name="OkButton" Content="ok" Width="90" Click="OkButton_OnClick" />
+            <Label Width="170" />
+            <Button Name="CancelButton" Content="cancel" Width="90" />
+        </StackPanel>
+        
     </Grid>
 </Window>

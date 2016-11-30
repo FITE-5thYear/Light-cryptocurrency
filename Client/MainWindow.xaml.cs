@@ -24,35 +24,22 @@ namespace Client
         {
             InitializeComponent();
         }
-        private void ConnectToServerButton_OnClick(object sender, RoutedEventArgs e)
+        
+
+      
+
+        private void OkButton_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
                 client.InitClient();
-                ConnectionStatusLabel.Content = "sucessfully connected\n";
-                RequestAccButton.Visibility = Visibility.Visible;
+                client.authentaction(UserNameTextBox.Text,PasswordBox.Password);
             }
             catch (Exception)
             {
-
-                ConnectionStatusLabel.Content = "Failed to connect\n";
+                MessageBox.Show("Can not connect to server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                
             }
         }
-
-        private void RequestAccButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                string s = client.RequestAcc();
-                ConnectionStatusLabel.Content += "Request is sent\n";
-                ConnectionStatusLabel.Content += s;
-            }
-            catch (Exception exception)
-            {
-                ConnectionStatusLabel.Content += "Falied to send Request";
-                ConnectionStatusLabel.Content += exception.ToString();
-            }
-        }
-
     }
 }
