@@ -1,45 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Client.Models;
+using System;
+using System.Net.Sockets;
+using System.Web.Script.Serialization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Client
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        public static Client.Models.Client user;
         public MainWindow()
         {
             InitializeComponent();
         }
-        
 
-      
+        public void Log(string logMessage)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += logMessage; }));
+        }
 
-        private void OkButton_OnClick(object sender, RoutedEventArgs e)
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+
+        private void connect_Click_1(object sender, RoutedEventArgs e)
         {
             try
             {
-                client.InitClient();
-                client.authentaction(UserNameTextBox.Text,PasswordBox.Password);
+                UtilitiesMethods.InitClient(this);
+                connect.IsEnabled = false;
             }
-            catch (Exception)
+            catch (Exception x)
             {
-                MessageBox.Show("Can not connect to server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                
+                connect.IsEnabled = true;
+                MessageBox.Show(x.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void loginButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoginObject loginObeject = new LoginObject(usernameTextBox.Text,passwordTextBox.Text);
+            UtilitiesMethods.login(loginObeject.toJsonObject(),this);
+            
+        }
+
+        private void loginButton1_Click(object sender, RoutedEventArgs e)
+        {
+            TransactionObject transactionObject = new TransactionObject(user.Id.ToString(), 
+               reciverIDTextBox.Text.ToString(), 
+                ammountTextBox.Text.ToString());
+
+            UtilitiesMethods.transfer(transactionObject.toJsonObject(), this);
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

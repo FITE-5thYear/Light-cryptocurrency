@@ -1,90 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Server.Util;
+using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Server
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public static string lableContent;
 
-        public MainWindow()
+    public partial class ClientWindows : Window
+    {
+        private CryptocurrencyContext db;
+
+        public ClientWindows()
         {
             InitializeComponent();
+
+            db = new CryptocurrencyContext();
             try
             {
-                server.IntiServer();
-                clientAccount.fillList();
-                serverStarted.Content = "server sucessfully started";
-
-
-                try
-                {
-                    var t1 = new Thread(listenToserver);
-                    t1.Start(this);
-
-                }
-                catch (Exception)
-                {
-
-                    displayStatus("connection error");
-                }
-
+                ServerMethods.IntiServer();
+                Log("Server Sucessfully Started.\n");
+                new Thread(listenToserver).Start(this);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                serverStarted.Content = "server failed to start";
+                Log("Server Failed To Start.\n");
             }
-
-
         }
 
-        public void displayStatus(string s)
+        public void Log(string logMessage)
         {
-            lableContent = s;
-            Dispatcher.Invoke(DispatcherPriority.Normal, new Action<Label>(setlableValue), connectionstatus);
+            Application.Current.Dispatcher.Invoke((Action)(() =>{ logTextBox.Text += logMessage;}));
         }
 
         public static void listenToserver(object arg)
         {
-            MainWindow mainWindow = (MainWindow)arg;
-            server.Listening(mainWindow);
-        }
-
-        private static void setlableValue(Label l)
-        {
-
-            l.Content += lableContent;
-        }
-
-        private void CreatUserButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            var windows = new CreatUserWindows();
-            windows.Activate();
-            windows.InitializeComponent();
-            windows.Show();
+            ClientWindows mainWindow = (ClientWindows)arg;
+            ServerMethods.BeginListening(mainWindow);
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
-            server.tcpListener.Stop();
+            ServerMethods.tcpListener.Stop();
+        }
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (ClientsTab.IsSelected)
+            {
+               
+                ClientsDataGrid.ItemsSource = db.Clients.ToArray();
+            }
+
+            if (TransactionsTab.IsSelected)
+            {
+                TransactionsDataGrid.ItemsSource = db.Transactions.ToArray();
+            }
         }
     }
-
 }

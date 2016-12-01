@@ -1,22 +1,26 @@
-﻿<Window x:Class="Server.MainWindow"
+﻿<Window x:Class="Server.ClientWindows"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525"
+        Title="Server" Height="474.058" Width="861.215"
         Closed="MainWindow_OnClosed">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260*"/>
-            <ColumnDefinition Width="129*"/>
-            <ColumnDefinition Width="128*"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel  Margin="0,0,89.179,0">
-            <Button Name="CreatUserButton" Content="Create New user" Click="CreatUserButton_OnClick"/>
+    <TabControl x:Name="tabControl" Margin="0,0,0,0" SelectionChanged="tabControl_SelectionChanged">
+        <TabItem Header="Log" Background="#FFE5E5E5">
+            <Grid>
 
-        </StackPanel>
-        <StackPanel Margin="171,0,0,0" Grid.ColumnSpan="3">
-            <Label x:Name="serverStarted" Content=""/>
-            <Label x:Name="connectionstatus" Content=""/>
-        </StackPanel>
-
-    </Grid>
+                <TextBox x:Name="logTextBox" TextWrapping="Wrap" Text="" Margin="10,35,10,5"/>
+                <Label x:Name="label" Content="Server Log:" HorizontalAlignment="Left" Margin="5,9,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </TabItem>
+        <TabItem x:Name="ClientsTab" Header="Clients">
+            <Grid Background="#FFE5E5E5">
+                <DataGrid x:Name="ClientsDataGrid" ItemsSource="{Binding}"/>
+            </Grid>
+        </TabItem>
+        <TabItem x:Name="TransactionsTab" Header="Transactions">
+            <Grid Background="#FFE5E5E5">
+                <DataGrid x:Name="TransactionsDataGrid" ItemsSource="{Binding}"/>
+            </Grid>
+        </TabItem>
+        
+    </TabControl>
 </Window>
