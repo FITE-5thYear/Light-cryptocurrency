@@ -9,36 +9,37 @@ using System.Windows.Threading;
 namespace Server
 {
 
-    public partial class ClientWindows : Window
+    public partial class MainWindow : Window
     {
-        private CryptocurrencyContext db;
 
-        public ClientWindows()
+        public static MainWindow instance;
+
+        public MainWindow()
         {
+            instance = this;
             InitializeComponent();
 
-            db = new CryptocurrencyContext();
+            DBContext.getInstace();
             try
             {
                 ServerMethods.IntiServer();
-                Log("Server Sucessfully Started.\n");
-                new Thread(listenToserver).Start(this);
+                Log("Server Sucessfully Started");
+
+                new Thread(() =>
+                {
+                    ServerMethods.BeginListening();
+                }).Start();
             }
             catch (Exception)
             {
-                Log("Server Failed To Start.\n");
+                Log("Server Failed To Start");
             }
         }
 
         public void Log(string logMessage)
         {
-            Application.Current.Dispatcher.Invoke((Action)(() =>{ logTextBox.Text += logMessage;}));
-        }
-
-        public static void listenToserver(object arg)
-        {
-            ClientWindows mainWindow = (ClientWindows)arg;
-            ServerMethods.BeginListening(mainWindow);
+            Application.Current.Dispatcher.Invoke((Action)(() =>{ logTextBox.Text += logMessage+
+                "\n----------------------------------------------------------------------------------------------\n";}));
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
@@ -51,12 +52,12 @@ namespace Server
 
             if (ClientsTab.IsSelected)
             {
-                ClientsDataGrid.ItemsSource = db.Clients.ToArray();
+                ClientsDataGrid.ItemsSource = DBContext.getInstace().Clients.ToArray();
             }
 
             if (TransactionsTab.IsSelected)
             {
-                TransactionsDataGrid.ItemsSource = db.Transactions.ToArray();
+                TransactionsDataGrid.ItemsSource = DBContext.getInstace().Transactions.ToArray();
             }
         }
     }

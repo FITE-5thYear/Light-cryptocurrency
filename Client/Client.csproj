@@ -65,7 +65,7 @@
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\LoginObject.cs" />
     <Compile Include="Models\TransactionObject.cs" />
-    <Compile Include="Util\UtilitiesMethods.cs" />
+    <Compile Include="Util\ClientMethods.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

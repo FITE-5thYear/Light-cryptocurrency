@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Server.Models
 {
     [Serializable]
-    class LoginObject
+    public class LoginObject
     {
 
         public LoginObject() { }

@@ -76,8 +76,9 @@
     <Compile Include="Models\LoginObject.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\TransactionObject.cs" />
-    <Compile Include="Util\UtilitiesMethods.cs" />
-    <Compile Include="Util\CryptocurrencyContext.cs" />
+    <Compile Include="Util\HandleClient.cs" />
+    <Compile Include="Util\ServerMethods.cs" />
+    <Compile Include="Util\DBContext.cs" />
     <Compile Include="Util\CryptocurrencyDBInitializer.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

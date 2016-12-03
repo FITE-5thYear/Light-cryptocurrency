@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace Client
 {
-    class UtilitiesMethods
+    class ClientMethods
     {
 
         private static string IP = "127.0.0.1";
@@ -18,7 +18,7 @@ namespace Client
 
         public static TcpClient tcpClient;
   
-        public static void InitClient(MainWindow main)
+        public static void InitClient()
         {
             tcpClient = new TcpClient(IP, HOST);
             NetworkStream serverStream = tcpClient.GetStream();
@@ -38,10 +38,9 @@ namespace Client
 
             serverRSAPublicKey = Encoding.UTF8.GetString(inStream,0, lenght);
 
-            main.Log("Connect To Server\n");
-            main.Log("Server AES Public Key is \"" + serverAESPublicKey + "\"\n\n");
-            main.Log("Server AES Public Key is \"" + serverRSAPublicKey + "\"\n\n");
-            main.Log("\n\n\n");
+            MainWindow.instance.Log("Connect To Server");
+            MainWindow.instance.Log("Server AES Public Key" + serverAESPublicKey);
+            MainWindow.instance.Log("Server AES Public Key" + serverRSAPublicKey);
         }
 
         public static void login(string loginData,MainWindow mainWindow)
@@ -58,12 +57,6 @@ namespace Client
                 bytes[0] = 1;
                 serverStream.Write(bytes, 0, bytes.Length);
                 serverStream.Flush();
-
-                bytes = new Byte[1];
-                bytes[0] = (Byte)EncreptedLoginData.Length;
-                serverStream.Write(bytes, 0, bytes.Length);
-                serverStream.Flush();
-
 
                 bytes = Encoding.UTF8.GetBytes(EncreptedLoginData);
                 serverStream.Write(bytes, 0, bytes.Length);
@@ -86,11 +79,9 @@ namespace Client
                     bytes = new byte[256];
                     length = serverStream.Read(bytes, 0, bytes.Length);
                     string response = Encoding.UTF8.GetString(bytes, 0, length);
-
                     MainWindow.user = Client.Models.Client.newClientObject(response);
                     mainWindow.Log(response);                    
                 }
-
             }
             else
             {
@@ -98,7 +89,7 @@ namespace Client
             }
         }
 
-        public static void transfer(string transactionData,MainWindow mainWindow)
+        public static void transfer(string transactionData)
         {
             if (MainWindow.user == null) { 
                 MessageBox.Show("You need to login first");
@@ -113,7 +104,7 @@ namespace Client
                 RSA.FromXmlString(serverRSAPublicKey);
                 byte[] EncreptedLoginData = RSA.Encrypt(Encoding.UTF8.GetBytes(transactionData), false);
 
-                mainWindow.Log(Encoding.UTF8.GetString(EncreptedLoginData));
+                MainWindow.instance.Log(Encoding.UTF8.GetString(EncreptedLoginData));
 
                 byte[] bytes = new Byte[1];
                 bytes[0] = 3;
@@ -128,7 +119,7 @@ namespace Client
                 MessageBox.Show("Connect to server First", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        public static void ViewAllAccounts(MainWindow mainWindow) {
+        public static void ViewAllAccounts() {
            
             NetworkStream serverStream = tcpClient.GetStream();
             if (tcpClient != null)
@@ -144,11 +135,11 @@ namespace Client
                 int length = serverStream.Read(bytes, 0, bytes.Length);
                 string responseData = System.Text.Encoding.Unicode.GetString(bytes, 0, length);
 
-                mainWindow.Log("Enecrypted Accounts:\n");
-                mainWindow.Log(responseData+"\n\n");
+                MainWindow.instance.Log("Enecrypted Accounts:");
+                MainWindow.instance.Log(responseData);
                 string derypte = AES2.Decrypt(responseData, serverAESPublicKey);
-                mainWindow.Log("Decrypted Accounts:\n");
-                mainWindow.Log(derypte + "\n\n");
+                MainWindow.instance.Log("Decrypted Accounts:");
+                MainWindow.instance.Log(derypte);
             }
             else
             {

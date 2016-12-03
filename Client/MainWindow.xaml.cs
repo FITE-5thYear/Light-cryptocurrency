@@ -9,15 +9,20 @@ namespace Client
 {
     public partial class MainWindow : Window
     {
-        public static Client.Models.Client user;
+        public static Models.Client user;
+        public static MainWindow instance;
+
         public MainWindow()
         {
+            instance = this;
             InitializeComponent();
         }
 
         public void Log(string logMessage)
         {
-            Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += logMessage; }));
+            Application.Current.Dispatcher.Invoke((Action)(() => {
+                logTextBox.Text += logMessage +"\n----------------------------------------------------------------------------------------------\n";
+            }));
         }
 
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
@@ -26,7 +31,7 @@ namespace Client
         {
             try
             {
-                UtilitiesMethods.InitClient(this);
+                ClientMethods.InitClient();
                 connect.IsEnabled = false;
             }
             catch (Exception x)
@@ -39,7 +44,7 @@ namespace Client
         private void loginButton_Click(object sender, RoutedEventArgs e)
         {
 
-            if (UtilitiesMethods.tcpClient == null)
+            if (ClientMethods.tcpClient == null)
             {
                 MessageBox.Show("Connect to server first");
 
@@ -47,10 +52,8 @@ namespace Client
             else {
 
                 LoginObject loginObeject = new LoginObject(usernameTextBox.Text, passwordTextBox.Text);
-                UtilitiesMethods.login(loginObeject.toJsonObject(), this);
+                ClientMethods.login(loginObeject.toJsonObject(), this);
             }
-
-            
         }
 
         private void transferButton_Click(object sender, RoutedEventArgs e)
@@ -61,7 +64,7 @@ namespace Client
                    reciverIDTextBox.Text.ToString(),
                     ammountTextBox.Text.ToString());
 
-                UtilitiesMethods.transfer(transactionObject.toJsonObject(), this);
+                ClientMethods.transfer(transactionObject.toJsonObject());
             }
             else
             {
@@ -69,22 +72,15 @@ namespace Client
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void checkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (UtilitiesMethods.tcpClient == null)
+            if (ClientMethods.tcpClient == null)
             {
                 MessageBox.Show("Connect to server first");
-
             }
             else
             {
-                UtilitiesMethods.ViewAllAccounts(this);
-
+                ClientMethods.ViewAllAccounts();
             }
         }
     }

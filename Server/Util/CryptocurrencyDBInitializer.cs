@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Server.Util
 {
-    class CryptocurrencyDBInitializer : CreateDatabaseIfNotExists<CryptocurrencyContext>
+    class CryptocurrencyDBInitializer : CreateDatabaseIfNotExists<DBContext>
     {
-        protected override void Seed(CryptocurrencyContext context)
+        protected override void Seed(DBContext context)
         {
             IList<Server.Models.Client> defaultClients = new List<Server.Models.Client>();
 

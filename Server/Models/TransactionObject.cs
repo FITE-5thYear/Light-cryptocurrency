@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Server.Models
 {
     [Serializable]
-    class TransactionObject
+    public  class TransactionObject
     {
         public TransactionObject() { }
         public TransactionObject(string senderID, string reciverID, string amout)

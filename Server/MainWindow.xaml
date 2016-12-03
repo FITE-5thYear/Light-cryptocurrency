@@ -1,7 +1,7 @@
-﻿<Window x:Class="Server.ClientWindows"
+﻿<Window x:Class="Server.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Server" Height="474.058" Width="861.215"
+        Title="Server" Height="500" Width="1000"
         Closed="MainWindow_OnClosed">
     <TabControl x:Name="tabControl" Margin="0,0,0,0" SelectionChanged="tabControl_SelectionChanged">
         <TabItem Header="Log" Background="#FFE5E5E5">
