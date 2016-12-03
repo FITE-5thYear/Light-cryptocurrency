@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Algorithms;
+using System;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -49,7 +50,7 @@ namespace Client
             if (tcpClient != null)
             {
 
-                string EncreptedLoginData = AES1.Encrypt(loginData, serverAESPublicKey);
+                string EncreptedLoginData = AES2.Encrypt(loginData, serverAESPublicKey);
 
                 mainWindow.Log(EncreptedLoginData);
 
@@ -73,11 +74,11 @@ namespace Client
                 if(Encoding.UTF8.GetString(bytes) == "0")
                 {
                     //no user
-                    mainWindow.Log("No such user");
+                    mainWindow.Log("No such user\n");
                 }else if(Encoding.UTF8.GetString(bytes) == "1")
                 {
                     //wrong password
-                    mainWindow.Log("Wrong Password");
+                    mainWindow.Log("Wrong Password\n");
                 }
                 else
                 {
@@ -96,7 +97,6 @@ namespace Client
                 MessageBox.Show("Connect to server First", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
 
         public static void transfer(string transactionData,MainWindow mainWindow)
         {
@@ -122,6 +122,33 @@ namespace Client
 
                 serverStream.Write(EncreptedLoginData, 0, EncreptedLoginData.Length);
                 serverStream.Flush();
+            }
+            else
+            {
+                MessageBox.Show("Connect to server First", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        public static void ViewAllAccounts(MainWindow mainWindow) {
+           
+            NetworkStream serverStream = tcpClient.GetStream();
+            if (tcpClient != null)
+            {
+
+                byte[] bytes = new Byte[1];
+                bytes[0] = 4;
+                serverStream.Write(bytes, 0, bytes.Length);
+                serverStream.Flush();
+
+
+                bytes = new Byte[256];
+                int length = serverStream.Read(bytes, 0, bytes.Length);
+                string responseData = System.Text.Encoding.Unicode.GetString(bytes, 0, length);
+
+                mainWindow.Log("Enecrypted Accounts:\n");
+                mainWindow.Log(responseData+"\n\n");
+                string derypte = AES2.Decrypt(responseData, serverAESPublicKey);
+                mainWindow.Log("Decrypted Accounts:\n");
+                mainWindow.Log(derypte + "\n\n");
             }
             else
             {

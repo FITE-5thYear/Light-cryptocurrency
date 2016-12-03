@@ -69,6 +69,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Algorithms\AES1.cs" />
+    <Compile Include="Algorithms\AES2.cs" />
     <Compile Include="Algorithms\KeyGenerator.cs" />
     <Compile Include="Algorithms\RSA.cs" />
     <Compile Include="Models\Client.cs" />

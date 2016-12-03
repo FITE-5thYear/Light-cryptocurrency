@@ -38,23 +38,54 @@ namespace Client
 
         private void loginButton_Click(object sender, RoutedEventArgs e)
         {
-            LoginObject loginObeject = new LoginObject(usernameTextBox.Text,passwordTextBox.Text);
-            UtilitiesMethods.login(loginObeject.toJsonObject(),this);
+
+            if (UtilitiesMethods.tcpClient == null)
+            {
+                MessageBox.Show("Connect to server first");
+
+            }
+            else {
+
+                LoginObject loginObeject = new LoginObject(usernameTextBox.Text, passwordTextBox.Text);
+                UtilitiesMethods.login(loginObeject.toJsonObject(), this);
+            }
+
             
         }
 
-        private void loginButton1_Click(object sender, RoutedEventArgs e)
+        private void transferButton_Click(object sender, RoutedEventArgs e)
         {
-            TransactionObject transactionObject = new TransactionObject(user.Id.ToString(), 
-               reciverIDTextBox.Text.ToString(), 
-                ammountTextBox.Text.ToString());
+            if (user != null)
+            {
+                TransactionObject transactionObject = new TransactionObject(user.Id.ToString(),
+                   reciverIDTextBox.Text.ToString(),
+                    ammountTextBox.Text.ToString());
 
-            UtilitiesMethods.transfer(transactionObject.toJsonObject(), this);
+                UtilitiesMethods.transfer(transactionObject.toJsonObject(), this);
+            }
+            else
+            {
+                MessageBox.Show("You need to login first");
+            }
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void checkButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (UtilitiesMethods.tcpClient == null)
+            {
+                MessageBox.Show("Connect to server first");
+
+            }
+            else
+            {
+                UtilitiesMethods.ViewAllAccounts(this);
+
+            }
         }
     }
 }

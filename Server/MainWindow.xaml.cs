@@ -51,7 +51,6 @@ namespace Server
 
             if (ClientsTab.IsSelected)
             {
-               
                 ClientsDataGrid.ItemsSource = db.Clients.ToArray();
             }
 

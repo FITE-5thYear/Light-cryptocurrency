@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Server.Algorithms;
 using Server.Models;
 using Server.Util;
 using System;
@@ -131,11 +132,13 @@ namespace Server
                 {
 
                     byte[] bytes = new Byte[1];
+
+
                     NetworkStream stream = clientSocket.GetStream();
                     stream.Read(bytes, 0, bytes.Length);
                     mainWindow.Log("From Client " + clientNo + ":\n");
 
-                    if (bytes[0] == 0)
+                    if (bytes[0] == 0) // connect
                     {
                         stream.Write(ServerMethods.AESPublicKey, 0, ServerMethods.AESPublicKey.Length);
                         stream.Flush();
@@ -147,7 +150,7 @@ namespace Server
                     }
 
 
-                    if (bytes[0] == 1)
+                    if (bytes[0] == 1) // login
                     {
                         bytes = new Byte[1];
                         stream.Read(bytes, 0, bytes.Length);
@@ -157,7 +160,7 @@ namespace Server
                         mainWindow.Log("\t" + encrypteData + "\n");
 
 
-                        string realData = AES1.Decrypt(encrypteData, Convert.ToBase64String(ServerMethods.AESPublicKey));
+                        string realData = AES2.Decrypt(encrypteData, Convert.ToBase64String(ServerMethods.AESPublicKey));
                         mainWindow.Log("\t" + realData +"\n");
 
 
@@ -181,11 +184,9 @@ namespace Server
                                 bytes = Encoding.UTF8.GetBytes("1");
                                 stream.Write(bytes, 0, bytes.Length);
                                 stream.Flush();
-
                                 mainWindow.Log("\t" + "Wrong credentials for " + loginObject.username + "\n");
                             }else
                             {
-                                //ok
                                 bytes = Encoding.UTF8.GetBytes("2");
                                 stream.Write(bytes, 0, bytes.Length);
                                 stream.Flush();
@@ -200,18 +201,14 @@ namespace Server
                         }
 
                     }
-                    if (bytes[0] == 3)
+                    if (bytes[0] == 3) // transfer
                     {
                         bytes = new byte[128];
                         int lenght = stream.Read(bytes, 0, 128);
                         byte [] x = ServerMethods.RSA.Decrypt(bytes, false);
-                        String transactionData = System.Text.Encoding.UTF8.GetString(x);
+                        String transactionData = Encoding.UTF8.GetString(x);
                         mainWindow.Log("\t" + transactionData + "\n");
-
                         TransactionObject tran = TransactionObject.newLoginObject(transactionData);
-
-
-
                         if (ServerMethods.DoTransaction(tran.senderID, tran.reciverID, tran.amount))
                         {
                             mainWindow.Log("\t" + "Transaction Ok" + "\n");
@@ -223,7 +220,24 @@ namespace Server
                         }
                     }
 
+                    if (bytes[0] == 4)
+                    {
 
+                        CryptocurrencyContext db = new CryptocurrencyContext();
+                        var allAccountQuery = from t in db.Clients select t ;
+                        string allAccounts = null;
+                        foreach (Server.Models.Client clinet in allAccountQuery) {
+                            allAccounts += clinet.Username + "\t" + clinet.Balance + "\n"; 
+                        }
+
+                        string EncreptedAllAccounts = AES2.Encrypt(allAccounts, Convert.ToBase64String(ServerMethods.AESPublicKey));
+
+                        mainWindow.Log("Send all accounts encypted:\n");
+                        mainWindow.Log(EncreptedAllAccounts + "\n\n\n");
+                        bytes = Encoding.Unicode.GetBytes(EncreptedAllAccounts);
+                        stream.Write(bytes, 0, bytes.Length);
+                        stream.Flush();
+                    }
                 }
 
                 catch (Exception ex){
