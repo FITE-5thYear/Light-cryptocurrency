@@ -53,7 +53,7 @@ namespace Server.Util
                         MainWindow.instance.Log("Login Encrypted Data:\t" + encrypteData + "\n");
 
 
-                        string realData = AES2.Decrypt(encrypteData, Convert.ToBase64String(ServerMethods.AESPublicKey));
+                        string realData = AES.Decrypt(encrypteData, Convert.ToBase64String(ServerMethods.AESPublicKey));
                         MainWindow.instance.Log("Login Decrypted Data:\t" + realData + "\n");
 
 
@@ -123,7 +123,7 @@ namespace Server.Util
                             allAccounts += clinet.Username + "\t" + clinet.Balance;
                         }
 
-                        string EncreptedAllAccounts = AES2.Encrypt(allAccounts, Convert.ToBase64String(ServerMethods.AESPublicKey));
+                        string EncreptedAllAccounts = AES.Encrypt(allAccounts, Convert.ToBase64String(ServerMethods.AESPublicKey));
 
                         MainWindow.instance.Log("Send all accounts encypted:");
                         MainWindow.instance.Log(EncreptedAllAccounts);

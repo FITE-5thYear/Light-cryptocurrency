@@ -1,9 +1,8 @@
-﻿using Client.Algorithms;
+﻿using Server.Algorithms;
 using System;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web.Script.Serialization;
 using System.Windows;
 
 namespace Client
@@ -49,7 +48,7 @@ namespace Client
             if (tcpClient != null)
             {
 
-                string EncreptedLoginData = AES2.Encrypt(loginData, serverAESPublicKey);
+                string EncreptedLoginData = AES.Encrypt(loginData, serverAESPublicKey);
 
                 mainWindow.Log(EncreptedLoginData);
 
@@ -79,7 +78,7 @@ namespace Client
                     bytes = new byte[256];
                     length = serverStream.Read(bytes, 0, bytes.Length);
                     string response = Encoding.UTF8.GetString(bytes, 0, length);
-                    MainWindow.user = Client.Models.Client.newClientObject(response);
+                    MainWindow.user = Server.Models.Client.newClientObject(response);
                     mainWindow.Log(response);                    
                 }
             }
@@ -137,7 +136,7 @@ namespace Client
 
                 MainWindow.instance.Log("Enecrypted Accounts:");
                 MainWindow.instance.Log(responseData);
-                string derypte = AES2.Decrypt(responseData, serverAESPublicKey);
+                string derypte = AES.Decrypt(responseData, serverAESPublicKey);
                 MainWindow.instance.Log("Decrypted Accounts:");
                 MainWindow.instance.Log(derypte);
             }

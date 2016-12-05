@@ -1,7 +1,5 @@
-﻿using Client.Models;
+﻿using Server.Models;
 using System;
-using System.Net.Sockets;
-using System.Web.Script.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,7 +7,7 @@ namespace Client
 {
     public partial class MainWindow : Window
     {
-        public static Models.Client user;
+        public static Server.Models.Client user;
         public static MainWindow instance;
 
         public MainWindow()

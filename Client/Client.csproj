@@ -58,19 +58,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Algorithms\AES1.cs" />
-    <Compile Include="Algorithms\AES2.cs" />
-    <Compile Include="Algorithms\KeyGenerator.cs" />
-    <Compile Include="Algorithms\RSA.cs" />
-    <Compile Include="Models\Client.cs" />
-    <Compile Include="Models\LoginObject.cs" />
-    <Compile Include="Models\TransactionObject.cs" />
+    <Compile Include="..\Server\Algorithms\AES.cs">
+      <Link>Algorithms\AES.cs</Link>
+    </Compile>
+    <Compile Include="..\Server\Algorithms\KeyGenerator.cs">
+      <Link>Algorithms\KeyGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Server\Algorithms\RSA.cs">
+      <Link>Algorithms\RSA.cs</Link>
+    </Compile>
+    <Compile Include="..\Server\Models\Client.cs">
+      <Link>Models\Client.cs</Link>
+    </Compile>
+    <Compile Include="..\Server\Models\LoginObject.cs">
+      <Link>Models\LoginObject.cs</Link>
+    </Compile>
+    <Compile Include="..\Server\Models\TransactionObject.cs">
+      <Link>Models\TransactionObject.cs</Link>
+    </Compile>
     <Compile Include="Util\ClientMethods.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Algorithms\AES.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -107,6 +117,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="network_server.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ic_client.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
