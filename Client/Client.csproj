@@ -61,9 +61,6 @@
     <Compile Include="..\Server\Algorithms\AES.cs">
       <Link>Algorithms\AES.cs</Link>
     </Compile>
-    <Compile Include="..\Server\Algorithms\KeyGenerator.cs">
-      <Link>Algorithms\KeyGenerator.cs</Link>
-    </Compile>
     <Compile Include="..\Server\Algorithms\RSA.cs">
       <Link>Algorithms\RSA.cs</Link>
     </Compile>
@@ -76,7 +73,12 @@
     <Compile Include="..\Server\Models\TransactionObject.cs">
       <Link>Models\TransactionObject.cs</Link>
     </Compile>
-    <Compile Include="Util\ClientMethods.cs" />
+    <Compile Include="..\Server\Util\AdvanceStream.cs">
+      <Link>Util\AdvanceStream.cs</Link>
+    </Compile>
+    <Compile Include="Algorithms\KeyManager.cs" />
+    <Compile Include="Util\ClientObject.cs" />
+    <Compile Include="Util\RequestsManager.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

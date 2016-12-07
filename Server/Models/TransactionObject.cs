@@ -11,7 +11,7 @@ namespace Server.Models
     public  class TransactionObject
     {
         public TransactionObject() { }
-        public TransactionObject(string senderID, string reciverID, string amout)
+        public TransactionObject(string senderID, string reciverID, string amount)
         {
             this.senderID = senderID;
             this.reciverID = reciverID;

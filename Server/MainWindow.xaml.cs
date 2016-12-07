@@ -1,6 +1,8 @@
-﻿using Server.Util;
+﻿using Server.Algorithms;
+using Server.Util;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,32 +10,41 @@ using System.Windows.Threading;
 
 namespace Server
 {
-
     public partial class MainWindow : Window
     {
-
-        public static MainWindow instance;
+        private static string IP = "127.0.0.1";
+        private static int HOST = 13000;
+        private ServerObject server;
 
         public MainWindow()
         {
             instance = this;
             InitializeComponent();
-
             DBContext.getInstace();
-            try
-            {
-                ServerMethods.IntiServer();
-                Log("Server Sucessfully Started");
+            createServer();
+        }
 
-                new Thread(() =>
-                {
-                    ServerMethods.BeginListening();
-                }).Start();
-            }
-            catch (Exception)
-            {
-                Log("Server Failed To Start");
-            }
+        private void createServer()
+        {
+
+            //generate public key for server
+            KeysManager.generateAESPublicKey();
+            KeysManager.generateRSAPublicKey(RSAAlgorithm.RSAServiceProvider);
+
+            server = new ServerObject(IP, HOST);
+
+            server.logger = Log;
+            server.intiServer();
+
+            server.startServer();
+
+            server.respose = (s) => {
+
+                string requstType = s.ReadString();
+                ResposesManager.ProcessRequst(requstType,s);
+
+            };
+            
         }
 
         public void Log(string logMessage)
@@ -44,7 +55,7 @@ namespace Server
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
-            ServerMethods.tcpListener.Stop();
+            server.stopServer();
         }
 
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -60,5 +71,7 @@ namespace Server
                 TransactionsDataGrid.ItemsSource = DBContext.getInstace().Transactions.ToArray();
             }
         }
+
+        public static MainWindow instance;
     }
 }

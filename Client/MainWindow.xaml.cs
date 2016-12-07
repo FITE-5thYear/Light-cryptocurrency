@@ -1,57 +1,52 @@
-﻿using Server.Models;
+﻿using Client.Util;
+using Server.Models;
+using Server.Util;
 using System;
+using System.Net.Sockets;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Client
 {
+    public delegate void Logger(string message);
     public partial class MainWindow : Window
     {
+        private static string IP = "127.0.0.1";
+        private static int HOST = 13000;
+        private ClientObject clientObject;
+
         public static Server.Models.Client user;
-        public static MainWindow instance;
+        
 
         public MainWindow()
         {
             instance = this;
             InitializeComponent();
+
+            clientObject = new ClientObject();
+
+            clientObject.initClient(IP, HOST);
+
+            clientObject.connectUntilSuss((e)=> {
+
+                RequestsManager.GetPublicKey(e);
+            });
         }
 
         public void Log(string logMessage)
         {
             Application.Current.Dispatcher.Invoke((Action)(() => {
-                logTextBox.Text += logMessage +"\n----------------------------------------------------------------------------------------------\n";
+                logTextBox.Text += logMessage +"\n";
             }));
         }
 
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
 
-        private void connect_Click_1(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ClientMethods.InitClient();
-                connect.IsEnabled = false;
-            }
-            catch (Exception x)
-            {
-                connect.IsEnabled = true;
-                MessageBox.Show(x.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void loginButton_Click(object sender, RoutedEventArgs e)
         {
-
-            if (ClientMethods.tcpClient == null)
-            {
-                MessageBox.Show("Connect to server first");
-
-            }
-            else {
-
-                LoginObject loginObeject = new LoginObject(usernameTextBox.Text, passwordTextBox.Text);
-                ClientMethods.login(loginObeject.toJsonObject(), this);
-            }
+            LoginObject loginObeject = new LoginObject(usernameTextBox.Text, passwordTextBox.Text);
+            RequestsManager.Login(clientObject.stream,loginObeject.toJsonObject());    
         }
 
         private void transferButton_Click(object sender, RoutedEventArgs e)
@@ -62,7 +57,7 @@ namespace Client
                    reciverIDTextBox.Text.ToString(),
                     ammountTextBox.Text.ToString());
 
-                ClientMethods.transfer(transactionObject.toJsonObject());
+                RequestsManager.Transfer(clientObject.stream, transactionObject.toJsonObject());
             }
             else
             {
@@ -72,14 +67,15 @@ namespace Client
 
         private void checkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ClientMethods.tcpClient == null)
-            {
-                MessageBox.Show("Connect to server first");
-            }
-            else
-            {
-                ClientMethods.ViewAllAccounts();
-            }
+            RequestsManager.ViewAllAccounts(clientObject.stream);
         }
+
+        private void MainWindow_OnClosed(object sender, EventArgs e)
+        {
+            clientObject.close();
+        }
+
+
+        public static MainWindow instance;
     }
 }

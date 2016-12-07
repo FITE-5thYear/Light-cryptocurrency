@@ -69,16 +69,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Algorithms\AES.cs" />
-    <Compile Include="Algorithms\KeyGenerator.cs" />
+    <Compile Include="Algorithms\KeysManager.cs" />
     <Compile Include="Algorithms\RSA.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\LoginObject.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\TransactionObject.cs" />
-    <Compile Include="Util\HandleClient.cs" />
-    <Compile Include="Util\ServerMethods.cs" />
-    <Compile Include="Util\DBContext.cs" />
-    <Compile Include="Util\CryptocurrencyDBInitializer.cs" />
+    <Compile Include="Util\AdvanceStream.cs" />
+    <Compile Include="Util\RequestsManager.cs" />
+    <Compile Include="DB\DBContext.cs" />
+    <Compile Include="DB\DBInitializer.cs" />
+    <Compile Include="Util\ServerObject.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
