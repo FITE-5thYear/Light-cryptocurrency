@@ -33,7 +33,7 @@ namespace Server.Util
         {
             tcpListener.Start();
             log("Server started");
-            new Thread(() =>
+            Thread x = new Thread(() =>
             {
                 // waiting for clinets
                 try
@@ -49,18 +49,22 @@ namespace Server.Util
                 {
                     log("Server failed to start\n" + e.Message);
                 }
-            }).Start();
+            });
+            x.IsBackground = true;
+            x.Start();
         }
         private void resposeToClient(AdvanceStream streamWithClient)
         {
             // waiting to recive smth from spesific client
-            new Thread(() =>
+            Thread x = new Thread(() =>
             {
                 while (true)
                 {
                     respose.Invoke(streamWithClient);
                 }
-            }).Start();
+            });
+            x.IsBackground = true;
+            x.Start();
         }
 
         private void log(string message)

@@ -41,7 +41,8 @@ namespace Client.Util
 
         public void connectUntilSuss(onConnect onConnect)
         {
-            new Thread(() => {
+            Thread x = new Thread(() =>
+            {
                 while (true)
                 {
                     try
@@ -56,11 +57,13 @@ namespace Client.Util
                     }
                     catch (Exception e)
                     {
-                       
+
                     }
                 }
 
-            }).Start();
+            });
+            x.IsBackground = true;
+            x.Start();
         }
 
         public void close()

@@ -31,5 +31,9 @@ namespace Server.Models
         {
             return JsonConvert.DeserializeObject<TransactionObject>(jsonObject);
         }
+
+        override public string ToString() {
+            return senderID + " " + reciverID + " " + amount;
+        }
     }
 }

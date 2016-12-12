@@ -1,4 +1,5 @@
-﻿using Client.Util;
+﻿using Client.Algorithms;
+using Client.Util;
 using Server.Models;
 using Server.Util;
 using System;
@@ -17,28 +18,28 @@ namespace Client
         private ClientObject clientObject;
 
         public static Server.Models.Client user;
-        
+
 
         public MainWindow()
         {
             instance = this;
+
             InitializeComponent();
 
             clientObject = new ClientObject();
 
             clientObject.initClient(IP, HOST);
 
-            clientObject.connectUntilSuss((e)=> {
+            Log("Clinet started");
+
+            KeyManager.generateSessionKey();
+
+            clientObject.connectUntilSuss((e) =>
+            {
 
                 RequestsManager.GetPublicKey(e);
             });
-        }
 
-        public void Log(string logMessage)
-        {
-            Application.Current.Dispatcher.Invoke((Action)(() => {
-                logTextBox.Text += logMessage +"\n";
-            }));
         }
 
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
@@ -57,7 +58,7 @@ namespace Client
                    reciverIDTextBox.Text.ToString(),
                     ammountTextBox.Text.ToString());
 
-                RequestsManager.Transfer(clientObject.stream, transactionObject.toJsonObject());
+                RequestsManager.TransferWithRSA(clientObject.stream, transactionObject.toJsonObject());
             }
             else
             {
@@ -77,5 +78,23 @@ namespace Client
 
 
         public static MainWindow instance;
+
+
+        public void Log()
+        {
+            Log("---------------------------------------------------------------------------------------------------\n");
+        }
+
+        public void Log(string logMessage)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += logMessage + "\n\n"; }));
+        }
+
+
+        public void Log(string messageDescription, string logMessage)
+        {
+            string format = "{0}:\n\t{1}\n\n";
+            Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += string.Format(format, messageDescription, logMessage); }));
+        }
     }
 }

@@ -16,5 +16,6 @@ namespace Server.Models
 
         public virtual Client Sender { get; set; }
         public virtual Client Reciver{ get; set; }
+
     }
 }

@@ -2,11 +2,8 @@
 using Server.Util;
 using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace Server
 {
@@ -26,17 +23,22 @@ namespace Server
 
         private void createServer()
         {
+            AES.getInstance();
+            RSA rsa = new RSA("Server");
 
-            //generate public key for server
-            KeysManager.generateAESPublicKey();
-            KeysManager.generateRSAPublicKey(RSAAlgorithm.RSAServiceProvider);
-
+            KeysManager.generateAESKey();
+            KeysManager.generateRSAPublicKey(rsa.rsaSP);
+            
             server = new ServerObject(IP, HOST);
 
             server.logger = Log;
             server.intiServer();
 
             server.startServer();
+            Log("Server Generated AES Public Key", Convert.ToBase64String(KeysManager.AESkey));
+            Log("Server Generated RSA Public Key", KeysManager.RSAPublicKey);
+            Log();
+
 
             server.respose = (s) => {
 
@@ -45,12 +47,6 @@ namespace Server
 
             };
             
-        }
-
-        public void Log(string logMessage)
-        {
-            Application.Current.Dispatcher.Invoke((Action)(() =>{ logTextBox.Text += logMessage+
-                "\n----------------------------------------------------------------------------------------------\n";}));
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
@@ -73,5 +69,23 @@ namespace Server
         }
 
         public static MainWindow instance;
+
+
+        public void Log()
+        {
+            Log("---------------------------------------------------------------------------------------------------\n");
+        }
+
+        public void Log(string logMessage)
+        {
+            Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += logMessage+"\n\n"; }));
+        }
+
+
+        public void Log(string messageDescription, string logMessage)
+        {
+            string format = "{0}:\n\t{1}\n\n";
+            Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += string.Format(format, messageDescription, logMessage); }));
+        }
     }
 }

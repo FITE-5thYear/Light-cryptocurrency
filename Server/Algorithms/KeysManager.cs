@@ -1,23 +1,30 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Server.Algorithms
 {
-    public class KeysManager
+    class KeysManager
     {
+        private static int AES_KEY_LENGTH = 16;
+        public static byte[] AESkey { get; set; }
 
-        public static byte[] AESPublicKey;
-        public static string RSAPublicKey;
+        public static string RSAPublicKey { get; set; }
 
-        public static void generateAESPublicKey()
+        public static void generateAESKey()
         {
             var random = new RNGCryptoServiceProvider();
-            var key = new byte[16];
+            var key = new byte[AES_KEY_LENGTH];
             random.GetBytes(key);
-            AESPublicKey = key;
+            AESkey = key;
         }
 
-        public static void generateRSAPublicKey(RSACryptoServiceProvider RSA) {
-            RSAPublicKey = RSA.ToXmlString(false);
+        public static void generateRSAPublicKey(RSACryptoServiceProvider rsa)
+        {
+            RSAPublicKey = rsa.ToXmlString(false);
         }
     }
 }

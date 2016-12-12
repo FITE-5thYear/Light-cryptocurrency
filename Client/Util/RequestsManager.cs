@@ -19,14 +19,17 @@ namespace Client.Util
             inStream = stream.ReadBytes();
             KeyManager.serverRSAPublicKey = Encoding.UTF8.GetString(inStream, 0, inStream.Length);
 
-            MainWindow.instance.Log("Server AES Public Key" + KeyManager.serverAESPublicKey);
-            MainWindow.instance.Log("Server AES Public Key" + KeyManager.serverRSAPublicKey);
+            MainWindow.instance.Log("Server AES Public Key",KeyManager.serverAESPublicKey);
+            MainWindow.instance.Log("Server AES Public Key",KeyManager.serverRSAPublicKey);
+            MainWindow.instance.Log();
         }
         public static void Login(AdvanceStream stream, string loginData)
         {
-            string EncreptedLoginData = AES.Encrypt(loginData, KeyManager.serverAESPublicKey);
+            AES aes = AES.getInstance();
+            string EncreptedLoginData = aes.Encrypt(loginData, KeyManager.serverAESPublicKey);
 
-            MainWindow.instance.Log(EncreptedLoginData);
+            MainWindow.instance.Log("Login Data", loginData);
+            MainWindow.instance.Log("Encrypted Login Data", EncreptedLoginData);
 
             stream.Write("1");
 
@@ -36,12 +39,12 @@ namespace Client.Util
             if (response.Equals("0"))
             {
                 //no user
-                MainWindow.instance.Log("No such user\n");
+                MainWindow.instance.Log("No such user");
             }
             else if (response.Equals("1"))
             {
                 //wrong password
-                MainWindow.instance.Log("Wrong Password\n");
+                MainWindow.instance.Log("Wrong Password");
             }
             else
             {
@@ -50,31 +53,72 @@ namespace Client.Util
                 MainWindow.user = Server.Models.Client.newClientObject(response);
                 MainWindow.instance.Log(response);
             }
-            
+
+            MainWindow.instance.Log();
         }
-        public static void Transfer(AdvanceStream stream, string transactionData)
+
+        public static void TransferWithRSA(AdvanceStream stream, string transactionData)
         {
-            RSAAlgorithm.RSAServiceProvider.FromXmlString(KeyManager.serverRSAPublicKey);
-            byte[] EncreptedLoginData = RSAAlgorithm.RSAServiceProvider.Encrypt(Encoding.UTF8.GetBytes(transactionData), false);
-
-            MainWindow.instance.Log(Encoding.UTF8.GetString(EncreptedLoginData));
-
+            RSA rsa = new RSA ("Server");
+            byte[] EncryptedTransferData = rsa.encrypte(getBytes(transactionData), KeyManager.serverRSAPublicKey);
+           
             stream.Write("2");
+            stream.Write(EncryptedTransferData);
 
-            stream.Write(EncreptedLoginData);
-
+            MainWindow.instance.Log("Transfer Data", transactionData);
+            MainWindow.instance.Log("Encrypted Transfer Data", getString(EncryptedTransferData));
+            MainWindow.instance.Log();
         }
+
+
+        public static void TransferWithPGP(AdvanceStream stream, string transactionData)
+        {
+            AES aes = AES.getInstance();
+            RSA rsa = new RSA ("Client");
+            byte[] encryptedSessionKey = rsa.encrypte(Encoding.UTF8.GetBytes(KeyManager.SessionKey), KeyManager.serverRSAPublicKey);
+
+            stream.Write("4");
+
+            stream.Write(encryptedSessionKey);
+
+            string EncreptedTransferData = aes.Encrypt(transactionData, KeyManager.SessionKey);
+
+            stream.Write(EncreptedTransferData);
+
+
+            MainWindow.instance.Log("Session Key", Convert.ToBase64String(getBytes(KeyManager.SessionKey)));
+            MainWindow.instance.Log("Encrypted Session Key", Convert.ToBase64String(encryptedSessionKey));
+            MainWindow.instance.Log("Transfer Data", transactionData);
+            MainWindow.instance.Log("Encrypted Transfer Data", EncreptedTransferData);
+            MainWindow.instance.Log();
+        }
+
         public static void ViewAllAccounts(AdvanceStream stream)
         {
+            AES aes = AES.getInstance();
             stream.Write("3");
 
-            string responseData = stream.ReadString();
-
-            MainWindow.instance.Log("Enecrypted Accounts:");
-            MainWindow.instance.Log(responseData);
-            string derypte = AES.Decrypt(responseData, KeyManager.serverAESPublicKey);
-            MainWindow.instance.Log("Decrypted Accounts:");
-            MainWindow.instance.Log(derypte);
+            string encrptedAccounts = stream.ReadString();
+            string deryptedAccounts = aes.Decrypt(encrptedAccounts, KeyManager.serverAESPublicKey);
+ 
+            MainWindow.instance.Log("Encrypted Accounts Data", encrptedAccounts);
+            MainWindow.instance.Log("Decrypted Accounts Data", deryptedAccounts);
+            MainWindow.instance.Log();
         }
+
+
+
+        #region Helper
+
+        private static string getString(byte[] bytes) {
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        private static byte[] getBytes(string st)
+        {
+            return Encoding.UTF8.GetBytes(st);
+        }
+
+        #endregion
     }
 }

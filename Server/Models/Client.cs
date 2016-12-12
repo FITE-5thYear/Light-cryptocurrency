@@ -24,5 +24,10 @@ namespace Server.Models
         {
             return JsonConvert.DeserializeObject<Client>(jsonObject);
         }
+
+        override public string ToString()
+        {
+            return Name;
+        }
     }
 }
