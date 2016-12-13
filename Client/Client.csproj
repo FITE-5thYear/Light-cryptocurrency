@@ -74,6 +74,9 @@
     <Compile Include="..\Server\Models\LoginObject.cs">
       <Link>Models\LoginObject.cs</Link>
     </Compile>
+    <Compile Include="..\Server\Models\SignUpObject.cs">
+      <Link>Models\SignUpObject.cs</Link>
+    </Compile>
     <Compile Include="..\Server\Models\TransactionObject.cs">
       <Link>Models\TransactionObject.cs</Link>
     </Compile>

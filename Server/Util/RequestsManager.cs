@@ -28,7 +28,48 @@ namespace Server.Util
                 case "4":
                     transferWithPGP(stream);
                     break;
+                case "5":
+                    signUp(stream);
+                    break;
             }
+        }
+
+        private static void signUp(AdvanceStream stream)
+        {
+            AES aes = AES.getInstance();
+            string encrypteData = stream.ReadString();
+            string realData = aes.Decrypt(encrypteData, KeysManager.AESkey);
+
+            MainWindow.instance.Log("Encrypted SignUp Data", encrypteData);
+            MainWindow.instance.Log("Decrypted SignUp Data", realData);
+
+            SignUpObject signUpObject = SignUpObject.newLoginObject(realData);
+
+            var user = DBContext.getInstace().Clients.SingleOrDefault(item => item.Username == signUpObject.username);
+            if (user != null)
+            {
+                if (user.Username.Equals(signUpObject.username))
+                {
+                    stream.Write("0");
+                    MainWindow.instance.Log("Error username already taken ", signUpObject.username);
+                } else
+                {
+                    stream.Write("1");
+                    MainWindow.instance.Log("Error password already taken");
+                }
+
+            }
+            else
+            {
+                DBContext.getInstace().Clients.Add(new Models.Client(signUpObject.name, signUpObject.username, signUpObject.password));
+                DBContext.getInstace().SaveChanges();
+                stream.Write("2");
+                user = DBContext.getInstace().Clients.SingleOrDefault(item => item.Username == signUpObject.username);
+                stream.Write(user.toJsonObject());
+                MainWindow.instance.Log("Sign Up Successfully", user.Name);  
+            }
+
+            MainWindow.instance.Log();
         }
 
         private static void sendKeys(AdvanceStream stream)

@@ -1,5 +1,6 @@
 ﻿using Client.Algorithms;
 using Server.Algorithms;
+using Server.Models;
 using Server.Util;
 using System;
 using System.Text;
@@ -19,12 +20,55 @@ namespace Client.Util
             inStream = stream.ReadBytes();
             KeyManager.serverRSAPublicKey = Encoding.UTF8.GetString(inStream, 0, inStream.Length);
 
-            MainWindow.instance.Log("Server AES Public Key",KeyManager.serverAESPublicKey);
-            MainWindow.instance.Log("Server AES Public Key",KeyManager.serverRSAPublicKey);
+            MainWindow.instance.Log("Server AES Public Key", KeyManager.serverAESPublicKey);
+            MainWindow.instance.Log("Server AES Public Key", KeyManager.serverRSAPublicKey);
             MainWindow.instance.Log();
         }
-        public static void Login(AdvanceStream stream, string loginData)
+
+        public static bool SignUp(AdvanceStream stream, string signUpData)
         {
+            bool signUpResult = false;
+            AES aes = AES.getInstance();
+            string EncreptedLoginData = aes.Encrypt(signUpData, KeyManager.serverAESPublicKey);
+
+            MainWindow.instance.Log("Sign Up Data", signUpData);
+            MainWindow.instance.Log("Encrypted Sign Up Data", EncreptedLoginData);
+
+            stream.Write("5");
+
+            stream.Write(EncreptedLoginData);
+
+            string response = stream.ReadString();
+            if (response.Equals("0"))
+            {
+                //no user
+                MainWindow.instance.Log("User name is taken");
+                signUpResult = false;
+            }
+            else if (response.Equals("1"))
+            {
+                //wrong password
+                MainWindow.instance.Log("Password is takten");
+                signUpResult = false;
+            }
+            else
+            {
+                //ok
+                response = stream.ReadString();
+                MainWindow.user = Server.Models.Client.newClientObject(response);
+                MainWindow.instance.Log(response);
+                signUpResult = true;
+            }
+
+            MainWindow.instance.Log();
+            return signUpResult;
+        }
+
+        public static Server.Models.Client Login(AdvanceStream stream, string loginData)
+        {
+            // To generate private key for RSA if not exist
+            RSA rsa = new RSA(LoginObject.newLoginObject(loginData).username);
+            
             AES aes = AES.getInstance();
             string EncreptedLoginData = aes.Encrypt(loginData, KeyManager.serverAESPublicKey);
 
@@ -40,26 +84,29 @@ namespace Client.Util
             {
                 //no user
                 MainWindow.instance.Log("No such user");
+                MainWindow.instance.Log();
+                return null;
             }
             else if (response.Equals("1"))
             {
                 //wrong password
                 MainWindow.instance.Log("Wrong Password");
+                MainWindow.instance.Log();
+                return null;
             }
             else
             {
                 //ok
                 response = stream.ReadString();
-                MainWindow.user = Server.Models.Client.newClientObject(response);
+                Server.Models.Client loginClient = Server.Models.Client.newClientObject(response);
                 MainWindow.instance.Log(response);
+                return loginClient;
             }
-
-            MainWindow.instance.Log();
         }
 
         public static void TransferWithRSA(AdvanceStream stream, string transactionData)
         {
-            RSA rsa = new RSA ("Server");
+            RSA rsa = new RSA ("Client");
             byte[] EncryptedTransferData = rsa.encrypte(getBytes(transactionData), KeyManager.serverRSAPublicKey);
            
             stream.Write("2");

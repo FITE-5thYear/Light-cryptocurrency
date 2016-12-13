@@ -17,10 +17,13 @@ namespace Client.Util
         private int host;
         private TcpClient tcpClient;
         public AdvanceStream stream { get; set; }
+        public bool isServerReady { get; set; }
 
         public Logger logger { get; set; }
 
-        public ClientObject() { }
+        public ClientObject() {
+            isServerReady = false;
+        }
 
         public void initClient(string ip,int host) {
             this.ip = ip;
@@ -49,6 +52,7 @@ namespace Client.Util
                     {
                         tcpClient = new TcpClient(ip, host);
                         stream = new AdvanceStream(tcpClient.GetStream());
+                        isServerReady = true;
                         onConnect.Invoke(stream);
                         if (tcpClient != null)
                         {
@@ -68,7 +72,8 @@ namespace Client.Util
 
         public void close()
         {
-            tcpClient.Close();
+            if (tcpClient != null)
+                tcpClient.Close();
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Client.Algorithms;
 using Client.Util;
+using Server.Algorithms;
 using Server.Models;
 using Server.Util;
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows;
@@ -42,12 +44,40 @@ namespace Client
 
         }
 
-        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
 
         private void loginButton_Click(object sender, RoutedEventArgs e)
         {
-            LoginObject loginObeject = new LoginObject(usernameTextBox.Text, passwordTextBox.Text);
-            RequestsManager.Login(clientObject.stream,loginObeject.toJsonObject());    
+            if (user == null)
+            {
+                // Login
+                LoginObject loginObeject = new LoginObject(loginUsernameTextBox.Text, loginPasswordTextBox.Password);
+                Server.Models.Client loginClient = RequestsManager.Login(clientObject.stream, loginObeject.toJsonObject());
+
+                if (loginClient != null)
+                {
+                    user = loginClient;
+                    TransactionsTab.Visibility = Visibility.Visible;
+                    checkAll.Visibility = Visibility.Visible;
+
+                    
+                    loginButton.Content = "SignOut";
+                    loginUsernameTextBox.Text = "";
+                    loginPasswordTextBox.Password = "";
+                }
+                else
+                {
+                    checkAll.Visibility = Visibility.Hidden;
+                    TransactionsTab.Visibility = Visibility.Hidden;
+                }
+            }
+            else {
+                // Sign out
+                TransactionsTab.Visibility = Visibility.Hidden;
+                checkAll.Visibility = Visibility.Hidden;
+                loginButton.Content = "Login";
+                loginUsernameTextBox.Text = "";
+                loginPasswordTextBox.Password = "";
+            }
         }
 
         private void transferButton_Click(object sender, RoutedEventArgs e)
@@ -58,7 +88,15 @@ namespace Client
                    reciverIDTextBox.Text.ToString(),
                     ammountTextBox.Text.ToString());
 
-                RequestsManager.TransferWithRSA(clientObject.stream, transactionObject.toJsonObject());
+                int selected = trasferAlgorithem.SelectedIndex;
+                if (selected == 0)
+                {
+                    // RSA
+                    RequestsManager.TransferWithRSA(clientObject.stream, transactionObject.toJsonObject());
+                }
+                else {
+                    RequestsManager.TransferWithPGP(clientObject.stream, transactionObject.toJsonObject());
+                }
             }
             else
             {
@@ -74,6 +112,58 @@ namespace Client
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
             clientObject.close();
+        }
+
+        private void signUpSubmitButton_Click(object sender, RoutedEventArgs e)
+        {
+            SignUpObject signUpObject = new SignUpObject(signUpNameTextBox.Text,signUpUsernameTextBox.Text, signUpPasswordTextBox.Password);
+            bool signUpResult = RequestsManager.SignUp(clientObject.stream, signUpObject.toJsonObject());
+            if (signUpResult)
+            {
+                TransactionsTab.Visibility = Visibility.Visible;
+                checkAll.Visibility = Visibility.Visible;
+                loginButton.Content = "SignOut";
+                loginUsernameTextBox.Text = "";
+                loginPasswordTextBox.Password = "";
+
+                signUpNameTextBox.Text = "";
+                signUpPasswordTextBox.Password = "";
+                signUpUsernameTextBox.Text = "";
+            }
+            else
+            {
+                TransactionsTab.Visibility = Visibility.Hidden;
+                checkAll.Visibility = Visibility.Hidden;
+            }
+        }
+
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (LoginTab.IsSelected)
+            {
+                if (user != null) {
+                    loginButton.Content = "SignOut";
+                    loginUsernameTextBox.Text = "";
+                    loginPasswordTextBox.Password = "";
+                }
+            }
+        }
+
+
+        private void trasferAlgorithem_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            List<string> data = new List<string>();
+            data.Add("RSA");
+            data.Add("PGP");
+
+            var comboBox = sender as ComboBox;
+
+            comboBox.ItemsSource = data;
+
+            comboBox.SelectedIndex = 0;
         }
 
 
@@ -93,8 +183,9 @@ namespace Client
 
         public void Log(string messageDescription, string logMessage)
         {
-            string format = "{0}:\n\t{1}\n\n";
+            string format = "{0}:\n{1}\n\n";
             Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += string.Format(format, messageDescription, logMessage); }));
         }
+
     }
 }

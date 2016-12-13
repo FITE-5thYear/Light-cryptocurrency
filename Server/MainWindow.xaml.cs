@@ -84,7 +84,7 @@ namespace Server
 
         public void Log(string messageDescription, string logMessage)
         {
-            string format = "{0}:\n\t{1}\n\n";
+            string format = "{0}:\n{1}\n\n";
             Application.Current.Dispatcher.Invoke((Action)(() => { logTextBox.Text += string.Format(format, messageDescription, logMessage); }));
         }
     }

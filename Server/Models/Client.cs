@@ -15,6 +15,15 @@ namespace Server.Models
         public String Password { get; set; }
         public int Balance { get; set; }
 
+        public Client() { }
+
+        public Client(string name, string username, string password) {
+            this.Name = name;
+            this.Username = username;
+            this.Password = password;
+            this.Balance = 0;
+        }
+
         public string toJsonObject()
         {
             return JsonConvert.SerializeObject(this);
