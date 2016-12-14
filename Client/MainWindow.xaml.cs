@@ -1,12 +1,8 @@
 ﻿using Client.Algorithms;
 using Client.Util;
-using Server.Algorithms;
 using Server.Models;
-using Server.Util;
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 

@@ -28,6 +28,7 @@ namespace Server
 
             KeysManager.generateAESKey();
             KeysManager.generateRSAPublicKey(rsa.rsaSP);
+            KeysManager.generateRSAPrivateKey(rsa.rsaSP);
             
             server = new ServerObject(IP, HOST);
 

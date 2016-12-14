@@ -106,7 +106,7 @@ namespace Client.Util
 
         public static void TransferWithRSA(AdvanceStream stream, string transactionData)
         {
-            RSA rsa = new RSA ("Client");
+            RSA rsa = new RSA(MainWindow.user.Username);
             byte[] EncryptedTransferData = rsa.encrypte(getBytes(transactionData), KeyManager.serverRSAPublicKey);
            
             stream.Write("2");
@@ -120,9 +120,10 @@ namespace Client.Util
 
         public static void TransferWithPGP(AdvanceStream stream, string transactionData)
         {
+            RSA rsa = new RSA(MainWindow.user.Username);
             AES aes = AES.getInstance();
-            RSA rsa = new RSA ("Client");
-            byte[] encryptedSessionKey = rsa.encrypte(Encoding.UTF8.GetBytes(KeyManager.SessionKey), KeyManager.serverRSAPublicKey);
+            
+            byte[] encryptedSessionKey = rsa.encrypte(getBytes(KeyManager.SessionKey), KeyManager.serverRSAPublicKey);
 
             stream.Write("4");
 

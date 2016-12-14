@@ -143,7 +143,7 @@ namespace Server.Util
             AES aes = AES.getInstance();
             RSA rsa = new RSA ("Server");
             byte[] encrypytedSessionKey = stream.ReadBytes();
-            byte[] sessionKeyBytes = rsa.decrypt(encrypytedSessionKey, KeysManager.RSAPublicKey);
+            byte[] sessionKeyBytes = rsa.decrypt(encrypytedSessionKey, KeysManager.RSAPrivateKey);
             string encrypteTransferData = stream.ReadString();
             string decrptedTransferData = aes.Decrypt(encrypteTransferData, getString(sessionKeyBytes));
 
