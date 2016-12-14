@@ -120,7 +120,7 @@ namespace Server.Util
         {
             RSA rsa = new RSA ("Server");
             byte[] encrypytedTransferBytes  = stream.ReadBytes();
-            byte[] decryptedTransferBytes   = rsa.decrypt(encrypytedTransferBytes, KeysManager.RSAPublicKey);
+            byte[] decryptedTransferBytes   = rsa.decrypt(encrypytedTransferBytes, KeysManager.RSAPrivateKey);
             MainWindow.instance.Log("Encrypted Transfer Data", getString(encrypytedTransferBytes));
             MainWindow.instance.Log("Decrypted Transfer Data", getString(decryptedTransferBytes));
 
@@ -152,19 +152,34 @@ namespace Server.Util
             MainWindow.instance.Log("Decrypted Session Key", Convert.ToBase64String(sessionKeyBytes));
             MainWindow.instance.Log("Encrypted Transfer Data", encrypteTransferData);
             MainWindow.instance.Log("Decrypted Transfer Data", decrptedTransferData);
-            TransactionObject tran = TransactionObject.newLoginObject(decrptedTransferData);
-            
-            if (DBContext.DoTransaction(tran.senderID, tran.reciverID, tran.amount))
+
+
+            string clientPublicKey = stream.ReadString();
+            MainWindow.instance.Log("Client Public RSA Key", clientPublicKey);
+
+
+            byte[] signture = stream.ReadBytes();
+
+            string recivedMessage = getString(encrypytedSessionKey) + encrypteTransferData;
+
+            if (rsa.verifyData(getBytes(recivedMessage),clientPublicKey, signture))
             {
-                MainWindow.instance.Log("Transaction Ok");
+                TransactionObject tran = TransactionObject.newLoginObject(decrptedTransferData);
+
+                if (DBContext.DoTransaction(tran.senderID, tran.reciverID, tran.amount))
+                {
+                    MainWindow.instance.Log("Transfer money done");
+                }
+                else
+                {
+                    MainWindow.instance.Log("Can't transfer money");
+                }
             }
             else
             {
-                MainWindow.instance.Log("Transaction Error");
-
+                MainWindow.instance.Log("Can't transfer money invalide signture");
             }
             MainWindow.instance.Log();
-
         }
 
         private static void viewAllAccount(AdvanceStream stream)

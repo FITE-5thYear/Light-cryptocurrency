@@ -68,7 +68,11 @@ namespace Client.Util
         {
             // To generate private key for RSA if not exist
             RSA rsa = new RSA(LoginObject.newLoginObject(loginData).username);
-            
+
+            KeyManager.generateRSAPublicKey(rsa.rsaSP);
+            KeyManager.generateRSAPrivateKey(rsa.rsaSP);
+
+
             AES aes = AES.getInstance();
             string EncreptedLoginData = aes.Encrypt(loginData, KeyManager.serverAESPublicKey);
 
@@ -133,11 +137,20 @@ namespace Client.Util
 
             stream.Write(EncreptedTransferData);
 
-
             MainWindow.instance.Log("Session Key", Convert.ToBase64String(getBytes(KeyManager.SessionKey)));
             MainWindow.instance.Log("Encrypted Session Key", Convert.ToBase64String(encryptedSessionKey));
             MainWindow.instance.Log("Transfer Data", transactionData);
             MainWindow.instance.Log("Encrypted Transfer Data", EncreptedTransferData);
+
+            stream.Write(KeyManager.RSAPublicKey);
+
+            string message = getString(encryptedSessionKey) + EncreptedTransferData;
+
+            byte[] signture = rsa.signData(getBytes(message), KeyManager.RSAPrivateKey);
+        
+
+            stream.Write(signture);
+
             MainWindow.instance.Log();
         }
 

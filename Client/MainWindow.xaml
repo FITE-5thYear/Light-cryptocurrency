@@ -28,7 +28,7 @@
                 <TextBox Height="22" HorizontalAlignment="Left" Margin="10,36,0,0" Name="signUpUsernameTextBox" VerticalAlignment="Top" Width="222" Grid.Column="1" />
                 <PasswordBox Height="22" HorizontalAlignment="Left" Margin="11,67,0,0" x:Name="signUpPasswordTextBox" VerticalAlignment="Top" Width="222" Grid.Column="1"/>
 
-                <Button Content="Submit" Height="22" HorizontalAlignment="Left" Margin="14,108,0,0" Name="signUpSubmitButton" VerticalAlignment="Top" Width="217" Grid.Column="1" Click="signUpSubmitButton_Click"/>
+                <Button Content="Submit" Height="22" HorizontalAlignment="Left" Margin="12,108,0,0" Name="signUpSubmitButton" VerticalAlignment="Top" Width="219" Grid.Column="1" Click="signUpSubmitButton_Click"/>
                 <TextBlock x:Name="signUpResult" HorizontalAlignment="Left" Margin="5,138,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="337" Height="22" Foreground="Red"/>
             </Grid>
 

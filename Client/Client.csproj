@@ -83,6 +83,7 @@
     <Compile Include="..\Server\Util\AdvanceStream.cs">
       <Link>Util\AdvanceStream.cs</Link>
     </Compile>
+    <Compile Include="Algorithms\HashManager.cs" />
     <Compile Include="Algorithms\KeyManager.cs" />
     <Compile Include="Util\ClientObject.cs" />
     <Compile Include="Util\RequestsManager.cs" />
