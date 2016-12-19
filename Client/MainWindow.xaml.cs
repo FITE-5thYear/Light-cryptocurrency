@@ -13,8 +13,9 @@ namespace Client
     {
         private static string IP = "127.0.0.1";
         private static int HOST = 13000;
+        private static int CA = 12000;
         private ClientObject clientObject;
-
+        public static ClientObject clientForCertificate;
         public static Server.Models.Client user;
 
 
@@ -28,7 +29,11 @@ namespace Client
 
             clientObject.initClient(IP, HOST);
 
+            clientForCertificate = new ClientObject();
+            clientForCertificate.initClient(IP, CA);
+
             Log("Clinet started");
+            Log("Wating certificate");
 
             KeyManager.generateSessionKey();
 
@@ -37,6 +42,7 @@ namespace Client
 
                 RequestsManager.GetPublicKey(e);
             });
+
 
         }
 

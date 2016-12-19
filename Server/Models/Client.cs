@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace Server.Models
 
         public static Client newClientObject(string jsonObject)
         {
+           
             return JsonConvert.DeserializeObject<Client>(jsonObject);
         }
 

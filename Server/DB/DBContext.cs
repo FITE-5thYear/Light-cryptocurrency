@@ -44,7 +44,15 @@ namespace Server.Util
 
             DBContext db = getInstace();
 
-            int transmitted = Int32.Parse(amount);
+            int transmitted;
+            try
+            {
+                transmitted = Int32.Parse(amount);
+            }
+            catch
+            {
+                transmitted = 0;
+            }
             var FromQuery = from t in db.Clients where t.Id == senderID select t;
             var ToQuery = from t in db.Clients where t.Id == reciverID select t;
             int senderBalance = 0;

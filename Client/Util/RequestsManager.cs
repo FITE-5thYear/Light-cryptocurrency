@@ -104,6 +104,11 @@ namespace Client.Util
                 response = stream.ReadString();
                 Server.Models.Client loginClient = Server.Models.Client.newClientObject(response);
                 MainWindow.instance.Log(response);
+                MainWindow.clientForCertificate.connectUntilSuss((e) =>
+                {
+                    RequestsManager.getCertificate(e);
+                });
+
                 return loginClient;
             }
         }
@@ -165,6 +170,19 @@ namespace Client.Util
             MainWindow.instance.Log("Encrypted Accounts Data", encrptedAccounts);
             MainWindow.instance.Log("Decrypted Accounts Data", deryptedAccounts);
             MainWindow.instance.Log();
+        }
+
+        public static void getCertificate(AdvanceStream stream)
+        {
+            stream.Write("0");
+            stream.Write(MainWindow.user.Username);
+            stream.Write(KeyManager.RSAPublicKey);
+            string certificateString = stream.ReadString();
+            Models.DigitalCertificate certificate = Models.DigitalCertificate.newClientObject(certificateString);
+            MainWindow.instance.Log(certificate.ToString());
+            
+
+            
         }
 
 

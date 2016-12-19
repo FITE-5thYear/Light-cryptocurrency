@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="Algorithms\HashManager.cs" />
     <Compile Include="Algorithms\KeyManager.cs" />
+    <Compile Include="Models\DigitalCertificate.cs" />
     <Compile Include="Util\ClientObject.cs" />
     <Compile Include="Util\RequestsManager.cs" />
     <Page Include="MainWindow.xaml">

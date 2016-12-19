@@ -26,6 +26,7 @@ namespace Server.Algorithms
         public static void generateRSAPublicKey(RSACryptoServiceProvider rsa)
         {
             RSAPublicKey = rsa.ToXmlString(false);
+        
         }
 
         public static void generateRSAPrivateKey(RSACryptoServiceProvider rsa)
