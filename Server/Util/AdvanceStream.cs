@@ -29,7 +29,7 @@ namespace Server.Util
         public void Write(byte[] bytesToWrite) {
             stream.Write(bytesToWrite, 0, bytesToWrite.Length);
             stream.Flush();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(1000);
         }
 
         public void Write(string stringToWrites)
@@ -37,7 +37,7 @@ namespace Server.Util
             Byte[] bytes = Encoding.UTF8.GetBytes(stringToWrites);
             stream.Write(bytes, 0, bytes.Length);
             stream.Flush();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(1000);
         }
 
     }

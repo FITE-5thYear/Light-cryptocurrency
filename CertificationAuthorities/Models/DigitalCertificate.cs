@@ -7,7 +7,7 @@ using CertificationAuthorities.Util;
 
 namespace CertificationAuthorities.Models
 {
-    class DigitalCertificate
+    public class DigitalCertificate
     {
         public static string IssuerName="Certification Authority";
         public int SerialNumber;

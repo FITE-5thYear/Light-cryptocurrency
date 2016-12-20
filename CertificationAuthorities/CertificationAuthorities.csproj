@@ -63,11 +63,18 @@
     <Compile Include="Algorithms\HashManager.cs" />
     <Compile Include="Algorithms\KeyManager.cs" />
     <Compile Include="Algorithms\RSA.cs" />
+    <Compile Include="CertifacteWindow.xaml.cs">
+      <DependentUpon>CertifacteWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\CertificateOwner.cs" />
     <Compile Include="Models\DigitalCertificate.cs" />
     <Compile Include="Util\AdvanceStream.cs" />
     <Compile Include="Util\RequestsManager.cs" />
     <Compile Include="Util\ServerObject.cs" />
+    <Page Include="CertifacteWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

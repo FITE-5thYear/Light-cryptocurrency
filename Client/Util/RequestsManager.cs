@@ -4,6 +4,7 @@ using Server.Models;
 using Server.Util;
 using System;
 using System.Text;
+using System.Windows;
 
 namespace Client.Util
 {
@@ -27,40 +28,60 @@ namespace Client.Util
 
         public static bool SignUp(AdvanceStream stream, string signUpData)
         {
+            bool result = false;
             bool signUpResult = false;
-            AES aes = AES.getInstance();
-            string EncreptedLoginData = aes.Encrypt(signUpData, KeyManager.serverAESPublicKey);
-
-            MainWindow.instance.Log("Sign Up Data", signUpData);
-            MainWindow.instance.Log("Encrypted Sign Up Data", EncreptedLoginData);
-
-            stream.Write("5");
-
-            stream.Write(EncreptedLoginData);
-
-            string response = stream.ReadString();
-            if (response.Equals("0"))
+            SignUpObject signUp = SignUpObject.newLoginObject(signUpData);
+            MainWindow.clientForCertificate.connectUntilSuss((e) =>
             {
-                //no user
-                MainWindow.instance.Log("User name is taken");
-                signUpResult = false;
-            }
-            else if (response.Equals("1"))
+                RequestsManager.connectToCA(e);
+            });
+            RSA rsa = new RSA(signUp.name);
+            KeyManager.generateRSAPublicKey(rsa.rsaSP);
+            KeyManager.generateRSAPrivateKey(rsa.rsaSP);
+
+            result =getCertificate(MainWindow.clientForCertificate.stream, signUp.name, KeyManager.RSAPublicKey);
+            if (result)
+
             {
-                //wrong password
-                MainWindow.instance.Log("Password is takten");
-                signUpResult = false;
+                
+                AES aes = AES.getInstance();
+                string EncreptedLoginData = aes.Encrypt(signUpData, KeyManager.serverAESPublicKey);
+
+                MainWindow.instance.Log("Sign Up Data", signUpData);
+                MainWindow.instance.Log("Encrypted Sign Up Data", EncreptedLoginData);
+
+                stream.Write("5");
+
+                stream.Write(EncreptedLoginData);
+
+                string response = stream.ReadString();
+                if (response.Equals("0"))
+                {
+                    //no user
+                    MainWindow.instance.Log("User name is taken");
+                    signUpResult = false;
+                }
+                else if (response.Equals("1"))
+                {
+                    //wrong password
+                    MainWindow.instance.Log("Password is takten");
+                    signUpResult = false;
+                }
+                else
+                {
+                    //ok
+                    response = stream.ReadString();
+                    MainWindow.user = Server.Models.Client.newClientObject(response);
+                    MainWindow.instance.Log(response);
+                    signUpResult = true;
+                }
+
+                MainWindow.instance.Log();
             }
             else
             {
-                //ok
-                response = stream.ReadString();
-                MainWindow.user = Server.Models.Client.newClientObject(response);
-                MainWindow.instance.Log(response);
-                signUpResult = true;
+                MessageBox.Show("Can't get a certificate");
             }
-
-            MainWindow.instance.Log();
             return signUpResult;
         }
 
@@ -104,10 +125,7 @@ namespace Client.Util
                 response = stream.ReadString();
                 Server.Models.Client loginClient = Server.Models.Client.newClientObject(response);
                 MainWindow.instance.Log(response);
-                MainWindow.clientForCertificate.connectUntilSuss((e) =>
-                {
-                    RequestsManager.getCertificate(e);
-                });
+               
 
                 return loginClient;
             }
@@ -172,14 +190,29 @@ namespace Client.Util
             MainWindow.instance.Log();
         }
 
-        public static void getCertificate(AdvanceStream stream)
+        public static void connectToCA(AdvanceStream stream)
+        {
+            stream.Write("100");
+        }
+        public static bool getCertificate(AdvanceStream stream,string userName,string publicKey)
         {
             stream.Write("0");
-            stream.Write(MainWindow.user.Username);
-            stream.Write(KeyManager.RSAPublicKey);
-            string certificateString = stream.ReadString();
-            Models.DigitalCertificate certificate = Models.DigitalCertificate.newClientObject(certificateString);
-            MainWindow.instance.Log(certificate.ToString());
+            stream.Write(userName+'\t');
+            stream.Write(publicKey);
+            string result = stream.ReadString();
+            if (result == "1")
+            {
+                string certificateString = stream.ReadString();
+                Models.DigitalCertificate certificate = Models.DigitalCertificate.newClientObject(certificateString);
+                MainWindow.instance.Log(certificate.ToString());
+                MessageBox.Show(certificate.ToString());
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
             
 
             
@@ -189,7 +222,8 @@ namespace Client.Util
 
         #region Helper
 
-        private static string getString(byte[] bytes) {
+        private static string getString(byte[] bytes)
+        {
             return Encoding.UTF8.GetString(bytes);
         }
 

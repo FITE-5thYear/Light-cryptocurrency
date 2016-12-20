@@ -122,6 +122,7 @@ namespace Client
             bool signUpResult = RequestsManager.SignUp(clientObject.stream, signUpObject.toJsonObject());
             if (signUpResult)
             {
+               
                 TransactionsTab.Visibility = Visibility.Visible;
                 checkAll.Visibility = Visibility.Visible;
                 loginButton.Content = "SignOut";

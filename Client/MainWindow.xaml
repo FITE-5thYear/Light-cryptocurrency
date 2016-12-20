@@ -33,7 +33,7 @@
             </Grid>
 
         </TabItem>
-        <TabItem x:Name="LoginTab" Header="Login">
+        <TabItem x:Name="LoginTab" Header="Login" HorizontalAlignment="Right" Width="45">
             <Grid  Background="AliceBlue" Margin="-2,-2,297,255" >
                 <TextBlock Height="22" HorizontalAlignment="Left" Margin="4,6,0,0" Text="Username:" VerticalAlignment="Top" Width="110" />
                 <TextBlock Height="22" HorizontalAlignment="Left" Margin="4,36,0,0" Text="Password:" VerticalAlignment="Top" Width="110" />

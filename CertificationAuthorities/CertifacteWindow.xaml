@@ -1,0 +1,42 @@
+﻿<Window x:Class="CertificationAuthorities.CertifacteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CertificationAuthorities"
+        mc:Ignorable="d"
+        Title="Certifacte" Height="300" Width="500">
+    <Grid>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Issuer Name" />
+                <TextBlock Name="IssuerNameTB"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Serial Number"/>
+                <TextBlock Name="SerialNumberTB"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Certificate Owner"/>
+                <TextBlock Name="CertificateOwnerTB"/>
+            </StackPanel>
+            <StackPanel >
+                <Label Content="Vaildate Date"/>
+                <TextBlock Name="ValidateTB"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Owner Public Key"/>
+                <TextBlock Name="OwnerPublicKeyTB"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Margin="0,225,0,0" Orientation="Horizontal">
+            <Label Width="100"/>
+            <Button Name="OkButton" Content="Ok" Width="80" Height="50" Click="OkButton_Click"/>
+            <Label Width="100"/>
+            <Button Name="CancleButton" Content="Cancle"  Width="80" Height="50" Click="CancleButton_Click" />
+
+        </StackPanel>
+
+    </Grid>
+</Window>
