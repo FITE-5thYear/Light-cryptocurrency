@@ -33,11 +33,14 @@ namespace CertificationAuthorities.Util
           
             DateTime time = DateTime.Now;
             string data = stream.ReadString();
+          
             string[] word = data.Split('\t');
             string Name=word[0];
             String PublicKey= word[1];
             DigitalCertificate digitalCertificate = new DigitalCertificate(SerialNumber++, Name, time, PublicKey);
-            MessageBoxResult result = MessageBox.Show(digitalCertificate.ToString(), "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            mainwindow.Log("Digital Certificate",digitalCertificate.ToString());
+            mainwindow.Log();
+            MessageBoxResult result = MessageBox.Show("Send the Certificate", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
 
             if (result == MessageBoxResult.OK) 
@@ -46,12 +49,7 @@ namespace CertificationAuthorities.Util
                 string message = digitalCertificate.ToString();
                 stream.Write(digitalCertificate.toJsonObject());
 
-                Application.Current.Dispatcher.Invoke((Action)(() => {
-                    mainwindow.CreateCertificatewindows(digitalCertificate);
-
-
-
-                }));
+                
 
             }
             else

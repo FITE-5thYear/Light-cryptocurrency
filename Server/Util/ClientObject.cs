@@ -55,9 +55,10 @@ namespace Server.Util
                         tcpClient = new TcpClient(ip, host);
                         stream = new AdvanceStream(tcpClient.GetStream());
                         isServerReady = true;
-                        onConnect.Invoke(stream);
+                       
                         if (tcpClient != null)
                         {
+                            onConnect.Invoke(stream);
                             break;
                         }
                     }

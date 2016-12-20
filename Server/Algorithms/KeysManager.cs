@@ -14,8 +14,8 @@ namespace Server.Algorithms
 
         public static string RSAPublicKey { get; set; }
         public static string RSAPrivateKey { get; set; }
-        public static string RSAPcublicKeyOfCA { get; set; }
-
+        public static string RSAPcublicKeyOfCA  { get; set; }
+       
         public static void generateAESKey()
         {
             var random = new RNGCryptoServiceProvider();

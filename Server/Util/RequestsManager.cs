@@ -1,17 +1,15 @@
 ﻿using Server.Algorithms;
 using Server.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+
 
 namespace Server.Util
 {
     public class ResposesManager
     {
-        public static void ProcessRequst(string requestType, AdvanceStream stream,MainWindow mainWindow) {
+        public static void ProcessRequst(string requestType, AdvanceStream stream, MainWindow mainWindow) {
             switch (requestType) {
                 case "0":
                     sendKeys(stream);
@@ -29,70 +27,81 @@ namespace Server.Util
                     transferWithPGP(stream);
                     break;
                 case "5":
-                    signUp(stream,mainWindow);
+                    signUp(stream, mainWindow);
                     break;
             }
         }
 
-        private static void signUp(AdvanceStream stream,MainWindow mainWindow)
+        private static void signUp(AdvanceStream stream, MainWindow mainWindow)
         {
             string digCer = stream.ReadString();
             DigitalCertificate dc = DigitalCertificate.newClientObject(digCer);
             MainWindow.instance.Log("Get client certificate.....");
-            stream.Write("0");
-            string publicKey="";
+            string publicKey = "";
             MainWindow.instance.Log("connect to CA.....");
-            MainWindow.clientForCertificate.connectUntilSuss((e) =>
+
+
+            MainWindow.clientForCertificate.connect((e) =>
             {
-                connectToCA(e);
-                publicKey = getCApublicKey(MainWindow.clientForCertificate.stream);
-                KeysManager.RSAPcublicKeyOfCA = publicKey;
-                MainWindow.instance.Log("public key", publicKey);
+                e.Write("2");
             });
 
-            
+            publicKey = getCApublicKey(MainWindow.clientForCertificate.stream);
 
-            //AES aes = AES.getInstance();
-            //string encrypteData = stream.ReadString();
-            //string realData = aes.Decrypt(encrypteData, KeysManager.AESkey);
 
-            //MainWindow.instance.Log("Encrypted SignUp Data", encrypteData);
-            //MainWindow.instance.Log("Decrypted SignUp Data", realData);
 
-            //SignUpObject signUpObject = SignUpObject.newLoginObject(realData);
+            KeysManager.RSAPcublicKeyOfCA = publicKey;
+            MainWindow.instance.Log("CA public key", publicKey);
 
-            //var user = DBContext.getInstace().Clients.SingleOrDefault(item => item.Username == signUpObject.username);
-            //if (user != null)
-            //{
-            //    if (user.Username.Equals(signUpObject.username))
-            //    {
-            //        stream.Write("0");
-            //        MainWindow.instance.Log("Error username already taken ", signUpObject.username);
-            //    } else
-            //    {
-            //        stream.Write("1");
-            //        MainWindow.instance.Log("Error password already taken");
-            //    }
+            if (dc.verviy())
+            {
+                stream.Write("1");
+                byte[] encrSingUpdata = stream.ReadBytes();
+                RSA rsa = new RSA("Server");
+                byte[] decrypSingUpData = rsa.decrypt(encrSingUpdata, KeysManager.RSAPrivateKey);
 
-            //}
-            //else
-            //{
-            //    DBContext.getInstace().Clients.Add(new Models.Client(signUpObject.name, signUpObject.username, signUpObject.password));
-            //    DBContext.getInstace().SaveChanges();
-            //    stream.Write("2");
-            //    user = DBContext.getInstace().Clients.SingleOrDefault(item => item.Username == signUpObject.username);
-            //    stream.Write(user.toJsonObject());
-            //    MainWindow.instance.Log("Sign Up Successfully", user.Name);  
-            //}
+                MainWindow.instance.Log("Encrypted SignUp Data", Encoding.UTF8.GetString(encrSingUpdata));
+                MainWindow.instance.Log("Decrypted SignUp Data", Encoding.UTF8.GetString(decrypSingUpData));
 
+                SignUpObject signUpObject = SignUpObject.newLoginObject(Encoding.UTF8.GetString(decrypSingUpData));
+                var user = DBContext.getInstace().Clients.SingleOrDefault(item => item.Username == signUpObject.username);
+                if (user != null)
+                {
+                    if (user.Username.Equals(signUpObject.username))
+                    {
+                        stream.Write("0");
+                        MainWindow.instance.Log("Error username already taken ", signUpObject.username);
+                    }
+                    else
+                    {
+                        stream.Write("1");
+                        MainWindow.instance.Log("Error password already taken");
+                    }
+
+                }
+                else
+                {
+                    DBContext.getInstace().Clients.Add(new Models.Client(signUpObject.name, signUpObject.username, signUpObject.password));
+                    DBContext.getInstace().SaveChanges();
+                    stream.Write("2");
+                    user = DBContext.getInstace().Clients.SingleOrDefault(item => item.Username == signUpObject.username);
+                    stream.Write(user.toJsonObject() + '\t'+"");
+                    byte[] encryptKey=rsa.encrypte(KeysManager.AESkey, dc.SubjectPublicKey);
+                    stream.Write(encryptKey);
+                    MainWindow.instance.Log("Sign Up Successfully", user.Name);
+                }
+
+
+            }
+            else
+            {
+                stream.Write("0");
+            }
+        
             MainWindow.instance.Log();
         }
 
-        private static void connectToCA(AdvanceStream stream)
-        {
-            stream.Write("2");
-            
-        }
+        
         private static string getCApublicKey(AdvanceStream stream)
         {
             stream.Write("3");
@@ -100,16 +109,21 @@ namespace Server.Util
         }
         private static void sendKeys(AdvanceStream stream)
         {
-            stream.Write(KeysManager.AESkey);
-
             stream.Write(KeysManager.RSAPublicKey);
         }
 
         private static void login(AdvanceStream stream)
         {
+   
             AES aes = AES.getInstance();
-            string encrypteData = stream.ReadString();
-            string realData = aes.Decrypt(encrypteData, KeysManager.AESkey);
+            string data = stream.ReadString();
+            string[] words = data.Split('\t');
+            string publicKey = words[0];
+            string encrypteData = words[1];
+            byte[] encryptByte = Encoding.UTF8.GetBytes(encrypteData);
+            RSA rsa = new RSA("Server");
+            byte[] realDatabyte = rsa.decrypt(encryptByte, KeysManager.RSAPrivateKey);
+            string realData = Encoding.UTF8.GetString(realDatabyte);
 
             MainWindow.instance.Log("Encrypted Login Data", encrypteData);
             MainWindow.instance.Log("Decrypted Login Data", realData);
@@ -131,9 +145,11 @@ namespace Server.Util
                 }
                 else
                 {
+                    
                     stream.Write("2");
-
                     stream.Write(user.toJsonObject());
+                    byte[] encryptKey = rsa.encrypte(KeysManager.AESkey,publicKey);
+                    stream.Write(encryptKey);
 
                     MainWindow.instance.Log("Logged in",user.Name);
                 }

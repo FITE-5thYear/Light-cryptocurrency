@@ -45,7 +45,8 @@ namespace CertificationAuthorities.Util
         public void startServer()
         {
             tcpListener.Start();
-            log("Server started");
+            log("Certification Authority started");
+            log("Public Key"+"\n" +KeyManager.RSAPublicKey);
             Thread x = new Thread(() =>
             {
                 // waiting for clinets

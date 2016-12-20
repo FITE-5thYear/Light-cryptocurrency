@@ -1,7 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
 using System.Text;
-
+using Server.Algorithms;
+using Server.Util;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,9 +36,18 @@ namespace Server.Models
             s = "Issuer Name: " + IssuerName + "\n" + "Owner: " + SubjectName + "\n"
                 + "Owner public key: " + SubjectPublicKey + "\n" +
                 "Date validate :" + IssuingDate.Date.ToString()
-                // + "\nsignauture: " + Encoding.UTF8.GetString(DigitalSignature);
-                ;
+                + "Owner Public Key"
+                 + SubjectPublicKey + "\n";
             return s;
+            return s;
+        }
+        public bool verviy()
+
+        {
+            byte[] bmsg = Encoding.UTF8.GetBytes(ToString());
+            RSA rsa = new RSA("Server");
+            return (rsa.verifyData(bmsg,KeysManager.RSAPcublicKeyOfCA, DigitalSignature));
+
         }
         public string toJsonObject()
         {

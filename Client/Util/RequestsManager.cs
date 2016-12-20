@@ -13,11 +13,7 @@ namespace Client.Util
         public static void GetPublicKey(AdvanceStream stream)
         {
             stream.Write("0");
-
-            byte[] inStream = stream.ReadBytes();
-            KeyManager.serverAESPublicKey = Convert.ToBase64String(inStream, 0, inStream.Length);
-
-
+            byte[] inStream;
             inStream = stream.ReadBytes();
             KeyManager.serverRSAPublicKey = Encoding.UTF8.GetString(inStream, 0, inStream.Length);
 
@@ -39,7 +35,7 @@ namespace Client.Util
             KeyManager.generateRSAPublicKey(rsa.rsaSP);
             KeyManager.generateRSAPrivateKey(rsa.rsaSP);
             Models.DigitalCertificate dc=new Models.DigitalCertificate();
-            result =getCertificate(MainWindow.clientForCertificate.stream, signUp.name, KeyManager.RSAPublicKey,dc);
+            result =getCertificate(MainWindow.clientForCertificate.stream, signUp.name, KeyManager.RSAPublicKey, out dc);
 
             stream.Write("5");
             if (result)
@@ -49,15 +45,14 @@ namespace Client.Util
                 string checkResult=stream.ReadString();
                 if (checkResult == "1")
                 {
-                    AES aes = AES.getInstance();
-                    string EncreptedLoginData = aes.Encrypt(signUpData, KeyManager.serverAESPublicKey);
+                    MainWindow.instance.Log("Certificate has been checked\nreciving Server Public Key");
+                    byte[] signUpByte = Encoding.UTF8.GetBytes(signUpData);
+                    byte[] EncreptedLoginDataByte = rsa.encrypte(signUpByte, KeyManager.serverRSAPublicKey);
 
                     MainWindow.instance.Log("Sign Up Data", signUpData);
-                    MainWindow.instance.Log("Encrypted Sign Up Data", EncreptedLoginData);
+                    MainWindow.instance.Log("Encrypted Sign Up Data",Encoding.UTF8.GetString( EncreptedLoginDataByte));
 
-
-                    stream.Write(EncreptedLoginData);
-
+                    stream.Write(EncreptedLoginDataByte);
                     string response = stream.ReadString();
                     if (response.Equals("0"))
                     {
@@ -75,8 +70,14 @@ namespace Client.Util
                     {
                         //ok
                         response = stream.ReadString();
-                        MainWindow.user = Server.Models.Client.newClientObject(response);
-                        MainWindow.instance.Log(response);
+                        string[] words = response.Split('\t');
+                        MainWindow.user = Server.Models.Client.newClientObject(words[0]);
+                        MainWindow.instance.Log(words[0]);
+                        byte[] inStream = stream.ReadBytes();
+                        byte[] decrypKey = rsa.decrypt(inStream, KeyManager.RSAPrivateKey);
+                        MainWindow.instance.Log("Encrypted AES Key", Convert.ToBase64String(inStream, 0, inStream.Length));
+                        KeyManager.serverAESPublicKey = Convert.ToBase64String(decrypKey, 0, decrypKey.Length);
+                        MainWindow.instance.Log("AES Key",KeyManager.serverAESPublicKey);
                         signUpResult = true;
                     }
                 }
@@ -103,14 +104,16 @@ namespace Client.Util
 
 
             AES aes = AES.getInstance();
-            string EncreptedLoginData = aes.Encrypt(loginData, KeyManager.serverAESPublicKey);
+            byte[] msg = Encoding.UTF8.GetBytes(loginData);
+            byte[] EncreptedLoginData = rsa.encrypte(msg, KeyManager.serverRSAPublicKey);
 
             MainWindow.instance.Log("Login Data", loginData);
-            MainWindow.instance.Log("Encrypted Login Data", EncreptedLoginData);
+            MainWindow.instance.Log("Encrypted Login Data",Encoding.UTF8.GetString( EncreptedLoginData));
 
             stream.Write("1");
-
-            stream.Write(EncreptedLoginData);
+            
+            stream.Write(KeyManager.RSAPublicKey+'\t'+ Encoding.UTF8.GetString( EncreptedLoginData));
+          
 
             string response = stream.ReadString();
             if (response.Equals("0"))
@@ -133,7 +136,12 @@ namespace Client.Util
                 response = stream.ReadString();
                 Server.Models.Client loginClient = Server.Models.Client.newClientObject(response);
                 MainWindow.instance.Log(response);
-               
+                byte[] inStream = stream.ReadBytes();
+                byte[] decrypKey = rsa.decrypt(inStream, KeyManager.RSAPrivateKey);
+                MainWindow.instance.Log("Encrypted AES Key", Convert.ToBase64String(inStream, 0, inStream.Length));
+                KeyManager.serverAESPublicKey = Convert.ToBase64String(decrypKey, 0, decrypKey.Length);
+                MainWindow.instance.Log("AES Key", KeyManager.serverAESPublicKey);
+
 
                 return loginClient;
             }
@@ -202,7 +210,7 @@ namespace Client.Util
         {
             stream.Write("100");
         }
-        public static bool getCertificate(AdvanceStream stream,string userName,string publicKey,Models.DigitalCertificate dc)
+        public static bool getCertificate(AdvanceStream stream,string userName,string publicKey,out Models.DigitalCertificate dc)
         {
             stream.Write("0");
             stream.Write(userName+'\t');
@@ -219,6 +227,7 @@ namespace Client.Util
             }
             else
             {
+                dc = null;
                 return false;
             }
 

@@ -33,22 +33,21 @@ namespace CertificationAuthorities.Models
             DigitalSignature= ServerObject.rsa.signData(message, KeyManager.RSAPrivateKey);
            
         }
-        public void verviy()
+        public bool verviy()
 
         {
             byte[] bmsg = Encoding.UTF8.GetBytes(ToString());
-            if (ServerObject.rsa.verifyData(bmsg, KeyManager.RSAPublicKey, DigitalSignature))
-                MessageBox.Show("true");
-            else
-                MessageBox.Show("false");
-                
+            return (ServerObject.rsa.verifyData(bmsg, KeyManager.RSAPublicKey, DigitalSignature));
+          
         }
         public override string ToString()
         {
             string s;
             s = "Issuer Name: " + IssuerName + "\n" + "Owner: " + SubjectName + "\n"
                 + "Owner public key: " + SubjectPublicKey + "\n" +
-                "Date validate :" + IssuingDate.Date.ToString();
+                "Date validate :" + IssuingDate.Date.ToString()
+                +"Owner Public Key"
+                 +SubjectPublicKey+"\n";
             return s;
         }
         public string toJsonObject()

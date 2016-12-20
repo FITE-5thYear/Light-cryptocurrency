@@ -20,9 +20,17 @@ namespace Server
             instance = this;
             InitializeComponent();
             DBContext.getInstace();
+            
+
+            createServer();
+
             clientForCertificate = new ClientObject();
             clientForCertificate.initClient(IP, CA);
-            createServer();
+            
+            //clientForCertificate.connectUntilSuss((e) =>
+            //{
+            //    e.Write("2");
+            //});
         }
 
         private void createServer()
