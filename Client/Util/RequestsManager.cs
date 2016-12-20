@@ -38,44 +38,52 @@ namespace Client.Util
             RSA rsa = new RSA(signUp.name);
             KeyManager.generateRSAPublicKey(rsa.rsaSP);
             KeyManager.generateRSAPrivateKey(rsa.rsaSP);
+            Models.DigitalCertificate dc=new Models.DigitalCertificate();
+            result =getCertificate(MainWindow.clientForCertificate.stream, signUp.name, KeyManager.RSAPublicKey,dc);
 
-            result =getCertificate(MainWindow.clientForCertificate.stream, signUp.name, KeyManager.RSAPublicKey);
+            stream.Write("5");
             if (result)
 
             {
-                
-                AES aes = AES.getInstance();
-                string EncreptedLoginData = aes.Encrypt(signUpData, KeyManager.serverAESPublicKey);
-
-                MainWindow.instance.Log("Sign Up Data", signUpData);
-                MainWindow.instance.Log("Encrypted Sign Up Data", EncreptedLoginData);
-
-                stream.Write("5");
-
-                stream.Write(EncreptedLoginData);
-
-                string response = stream.ReadString();
-                if (response.Equals("0"))
+                stream.Write(dc.toJsonObject());
+                string checkResult=stream.ReadString();
+                if (checkResult == "1")
                 {
-                    //no user
-                    MainWindow.instance.Log("User name is taken");
-                    signUpResult = false;
-                }
-                else if (response.Equals("1"))
-                {
-                    //wrong password
-                    MainWindow.instance.Log("Password is takten");
-                    signUpResult = false;
+                    AES aes = AES.getInstance();
+                    string EncreptedLoginData = aes.Encrypt(signUpData, KeyManager.serverAESPublicKey);
+
+                    MainWindow.instance.Log("Sign Up Data", signUpData);
+                    MainWindow.instance.Log("Encrypted Sign Up Data", EncreptedLoginData);
+
+
+                    stream.Write(EncreptedLoginData);
+
+                    string response = stream.ReadString();
+                    if (response.Equals("0"))
+                    {
+                        //no user
+                        MainWindow.instance.Log("User name is taken");
+                        signUpResult = false;
+                    }
+                    else if (response.Equals("1"))
+                    {
+                        //wrong password
+                        MainWindow.instance.Log("Password is takten");
+                        signUpResult = false;
+                    }
+                    else
+                    {
+                        //ok
+                        response = stream.ReadString();
+                        MainWindow.user = Server.Models.Client.newClientObject(response);
+                        MainWindow.instance.Log(response);
+                        signUpResult = true;
+                    }
                 }
                 else
                 {
-                    //ok
-                    response = stream.ReadString();
-                    MainWindow.user = Server.Models.Client.newClientObject(response);
-                    MainWindow.instance.Log(response);
-                    signUpResult = true;
+                    MessageBox.Show("Not a vailed certificate");
                 }
-
                 MainWindow.instance.Log();
             }
             else
@@ -194,7 +202,7 @@ namespace Client.Util
         {
             stream.Write("100");
         }
-        public static bool getCertificate(AdvanceStream stream,string userName,string publicKey)
+        public static bool getCertificate(AdvanceStream stream,string userName,string publicKey,Models.DigitalCertificate dc)
         {
             stream.Write("0");
             stream.Write(userName+'\t');
@@ -204,6 +212,7 @@ namespace Client.Util
             {
                 string certificateString = stream.ReadString();
                 Models.DigitalCertificate certificate = Models.DigitalCertificate.newClientObject(certificateString);
+                dc = certificate;
                 MainWindow.instance.Log(certificate.ToString());
                 MessageBox.Show(certificate.ToString());
                 return true;

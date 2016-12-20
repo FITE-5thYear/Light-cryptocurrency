@@ -1,4 +1,5 @@
 ﻿using CertificationAuthorities.Util;
+using CertificationAuthorities.Models;
 using System;
 using System.Windows;
 
@@ -12,9 +13,13 @@ namespace CertificationAuthorities
         private static string IP = "127.0.0.1";
         private static int HOST = 12000;
         private ServerObject server;
+        private CertifacteWindow cw;
         public MainWindow()
         {
             instance = this;
+            cw = new CertifacteWindow();
+            cw.Activate();
+            
             InitializeComponent();
             createServer();
         }
@@ -29,12 +34,19 @@ namespace CertificationAuthorities
             server.intiServer();
             server.startServer();
 
-            server.respose = (s) => {
+            server.respose = (s) =>
+            {
 
                 string requstType = s.ReadString();
-                RequestsManager.ProcessRequst(requstType, s);
+                RequestsManager.ProcessRequst(requstType, s, this);
 
             };
+        }
+        public  bool CreateCertificatewindows(DigitalCertificate dc)
+        {
+            
+            return (cw.showCertificate(dc));
+
         }
         public static MainWindow instance;
 

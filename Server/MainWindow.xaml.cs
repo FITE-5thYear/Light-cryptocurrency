@@ -9,15 +9,19 @@ namespace Server
 {
     public partial class MainWindow : Window
     {
-        private static string IP = "127.0.0.1";
-        private static int HOST = 13000;
+        public static string IP = "127.0.0.1";
+        public static int HOST = 13000;
+        public static int CA = 12000;
         private ServerObject server;
+        public  static ClientObject clientForCertificate;
 
         public MainWindow()
         {
             instance = this;
             InitializeComponent();
             DBContext.getInstace();
+            clientForCertificate = new ClientObject();
+            clientForCertificate.initClient(IP, CA);
             createServer();
         }
 
@@ -44,7 +48,7 @@ namespace Server
             server.respose = (s) => {
 
                 string requstType = s.ReadString();
-                ResposesManager.ProcessRequst(requstType,s);
+                ResposesManager.ProcessRequst(requstType,s,this);
 
             };
             

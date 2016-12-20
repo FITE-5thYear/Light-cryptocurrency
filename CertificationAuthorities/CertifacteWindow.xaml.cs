@@ -42,28 +42,29 @@ namespace CertificationAuthorities
             cancleButtonClicked = true;
             OkButton.IsEnabled = false;
         }
-        public static bool showCertificate(DigitalCertificate dc)
+        public bool showCertificate(DigitalCertificate dc)
         {
-            CertifacteWindow cw = new CertifacteWindow();
-            cw.Activate();
-            cw.InitializeComponent();
-            cw.IssuerNameTB.Text = DigitalCertificate.IssuerName;
-            cw.SerialNumberTB.Text = dc.SerialNumber.ToString();
-            cw.CertificateOwnerTB.Text = dc.SubjectName.ToString();
-            cw.ValidateTB.Text = dc.IssuingDate.Date.ToString();
-            cw.OwnerPublicKeyTB.Text = dc.SubjectPublicKey;
-            cw.Show();
+            
+           
+           
+            this.IssuerNameTB.Text = DigitalCertificate.IssuerName;
+            this.SerialNumberTB.Text = dc.SerialNumber.ToString();
+            this.CertificateOwnerTB.Text = dc.SubjectName.ToString();
+            this.ValidateTB.Text = dc.IssuingDate.Date.ToString();
+            this.OwnerPublicKeyTB.Text = dc.SubjectPublicKey;
+            this.Visibility = Visibility.Visible;
+            this.Show();
          
             while (true)
             {
-                if (cw.okButtonClicked)
+                if (this.okButtonClicked)
                 {
-                    cw.Close();
+                    
                     return true;
                 }
-                if(cw.cancleButtonClicked)
+                if(this.cancleButtonClicked)
                 {
-                    cw.Close();
+                   
                     return false;
                 }
             }
