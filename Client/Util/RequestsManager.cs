@@ -102,17 +102,19 @@ namespace Client.Util
             KeyManager.generateRSAPublicKey(rsa.rsaSP);
             KeyManager.generateRSAPrivateKey(rsa.rsaSP);
 
-
+            stream.Write("1");
+            stream.Write(KeyManager.RSAPublicKey);
             AES aes = AES.getInstance();
             byte[] msg = Encoding.UTF8.GetBytes(loginData);
             byte[] EncreptedLoginData = rsa.encrypte(msg, KeyManager.serverRSAPublicKey);
 
             MainWindow.instance.Log("Login Data", loginData);
             MainWindow.instance.Log("Encrypted Login Data",Encoding.UTF8.GetString( EncreptedLoginData));
+            stream.Write(EncreptedLoginData);
 
-            stream.Write("1");
+          
             
-            stream.Write(KeyManager.RSAPublicKey+'\t'+ Encoding.UTF8.GetString( EncreptedLoginData));
+      
           
 
             string response = stream.ReadString();

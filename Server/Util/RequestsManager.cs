@@ -116,16 +116,14 @@ namespace Server.Util
         {
    
             AES aes = AES.getInstance();
-            string data = stream.ReadString();
-            string[] words = data.Split('\t');
-            string publicKey = words[0];
-            string encrypteData = words[1];
-            byte[] encryptByte = Encoding.UTF8.GetBytes(encrypteData);
+            string publicKey = stream.ReadString();
+
+            byte[] encryptByte = stream.ReadBytes();
             RSA rsa = new RSA("Server");
             byte[] realDatabyte = rsa.decrypt(encryptByte, KeysManager.RSAPrivateKey);
             string realData = Encoding.UTF8.GetString(realDatabyte);
 
-            MainWindow.instance.Log("Encrypted Login Data", encrypteData);
+            MainWindow.instance.Log("Encrypted Login Data",Encoding.UTF8.GetString(encryptByte));
             MainWindow.instance.Log("Decrypted Login Data", realData);
 
             LoginObject loginObject = LoginObject.newLoginObject(realData);
